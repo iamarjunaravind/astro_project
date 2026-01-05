@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+    .text-theme {
+        color: #ab0d0d !important;
+    }
+
+    .bg-theme {
+        background-color: #ab0d0d !important;
+    }
+
+    .btn-theme-outline {
+        border-color: #ab0d0d;
+        color: #ab0d0d;
+    }
+
+    .btn-theme-outline:hover {
+        background-color: #ab0d0d;
+        color: #fff;
+    }
+
+    .hover-red-link:hover {
+        color: #ab0d0d !important;
+    }
+</style>
+<section class="py-5">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h1 class="display-4 fw-bold">From the <span class="text-theme">Stars</span></h1>
+            <p class="lead text-muted">Insights, articles, and cosmic wisdom.</p>
+        </div>
+
+        <div class="row g-4">
+            {% for post in posts %}
+            <div class="col-md-6 col-lg-4">
+                <div class="card h-100 border-0 shadow-sm hover-shadow transition-all">
+                    {% if post.image %}
+                    <img src="{{ post.image.url }}" class="card-img-top" alt="{{ post.title }}"
+                        style="height: 200px; object-fit: cover;">
+                    {% else %}
+                    <div class="bg-light d-flex align-items-center justify-content-center" style="height: 200px;">
+                        <i class="bi bi-stars text-muted display-4"></i>
+                    </div>
+                    {% endif %}
+                    <div class="card-body">
+                        <div class="small text-muted mb-2">
+                            {{ post.created_at|date:"F j, Y" }}
+                        </div>
+                        <h5 class="card-title fw-bold">
+                            <a href="{% url 'blog:blog_detail' post.slug %}"
+                                class="text-decoration-none text-dark stretched-link">
+                                {{ post.title }}
+                            </a>
+                        </h5>
+                        <p class="card-text text-muted">
+                            {{ post.content|striptags|truncatewords:20 }}
+                        </p>
+                    </div>
+                    <div class="card-footer bg-transparent border-0 pb-3">
+                        <div class="d-flex align-items-center">
+                            <div class="avatar-sm rounded-circle bg-theme text-white d-flex align-items-center justify-content-center me-2"
+                                style="width: 32px; height: 32px;">
+                                {{ post.author.username|slice:":1"|upper }}
+                            </div>
+                            <small class="text-muted">By {{ post.author.username }}</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-12 text-center py-5">
+                <p class="text-muted">No posts available yet. Calculating planetary alignments...</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endblock %}

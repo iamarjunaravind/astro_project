@@ -1,0 +1,201 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5 mb-5">
+    <h2 class="text-center mb-5" style="color: #ab0d0d; font-weight: 700;">Your Shopping Cart</h2>
+
+    {% if messages %}
+    {% for message in messages %}
+    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    {% endfor %}
+    {% endif %}
+
+    {% if cart_items %}
+    <div class="card shadow-sm border-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="bg-light">
+                    <tr>
+                        <th class="px-4 py-3">Product</th>
+                        <th class="py-3">Price</th>
+                        <th class="py-3 text-center">Quantity</th>
+                        <th class="py-3">Total</th>
+                        <th class="py-3 text-end px-4">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in cart_items %}
+                    <tr>
+                        <td class="px-4">
+                            <div class="d-flex align-items-center">
+                                {% if item.product.image %}
+                                <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}"
+                                    class="rounded me-3" style="width: 60px; height: 60px; object-fit: cover;">
+                                {% endif %}
+                                <span class="fw-bold">{{ item.product.name }}</span>
+                            </div>
+                        </td>
+                        <td>₹{{ item.product.price }}</td>
+                        <td>
+                            <div class="d-flex justify-content-center align-items-center">
+                                <form action="{% url 'astromall:update_cart_quantity' item.id %}" method="POST"
+                                    class="d-flex align-items-center">
+                                    {% csrf_token %}
+                                    <button type="submit" name="action" value="decrement"
+                                        class="btn btn-sm btn-outline-secondary rounded-circle px-2 py-0"
+                                        style="width: 30px; height: 30px;">-</button>
+                                    <span class="mx-3 fw-bold">{{ item.quantity }}</span>
+                                    <button type="submit" name="action" value="increment"
+                                        class="btn btn-sm btn-outline-secondary rounded-circle px-2 py-0"
+                                        style="width: 30px; height: 30px;">+</button>
+                                </form>
+                            </div>
+                        </td>
+                        <td class="fw-bold">₹{{ item.total_price }}</td>
+                        <td class="text-end px-4">
+                            <a href="{% url 'astromall:remove_from_cart' item.id %}"
+                                class="btn btn-sm btn-outline-danger px-3">Remove</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div class="card-footer bg-white border-top px-4 py-3">
+            <div class="d-flex justify-content-between align-items-center">
+                <h5 class="mb-0 fw-bold">Grand Total:</h5>
+                <h4 class="mb-0 text-danger fw-bold">₹{{ total_amount }}</h4>
+            </div>
+        </div>
+    </div>
+
+    <div class="d-flex justify-content-between mt-5">
+        <a href="{% url 'astromall:product_list' %}" class="btn btn-light border px-4 py-2"
+            style="border-radius: 8px;">Continue Shopping</a>
+        <button id="payButton" class="btn btn-danger px-5 py-2 fw-bold"
+            style="background-color: #ab0d0d; border-radius: 8px;">Pay & Place Order</button>
+    </div>
+    {% else %}
+    <div class="text-center py-5">
+        <div class="mb-4">
+            <i class="bi bi-cart-x text-muted" style="font-size: 4rem;"></i>
+        </div>
+        <h3>Your cart is empty</h3>
+        <p class="text-muted">Explore our selection of spiritual products.</p>
+        <a href="{% url 'astromall:product_list' %}" class="btn btn-danger mt-3 px-4 py-2"
+            style="background-color: #ab0d0d; border-radius: 8px;">Go to Store</a>
+    </div>
+    {% endif %}
+</div>
+
+<style>
+    .table thead th {
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: #6c757d;
+        border-bottom: none;
+    }
+
+    .table tbody td {
+        border-bottom: 1px solid #f8f9fa;
+        padding-top: 1.5rem;
+        padding-bottom: 1.5rem;
+    }
+
+    .btn-outline-secondary:hover {
+        background-color: #f8f9fa;
+        color: #ab0d0d;
+        border-color: #ab0d0d;
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+    document.getElementById('payButton').onclick = function (e) {
+        var btn = this;
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Processing...';
+
+        // Initiate payment on backend
+        fetch("{% url 'astromall:initiate_payment' %}", {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}'
+            }
+        })
+            .then(res => res.json())
+            .then(data => {
+                if (data.error) {
+                    alert("Error: " + data.error);
+                    btn.disabled = false;
+                    btn.innerHTML = 'Pay & Place Order';
+                    return;
+                }
+
+                var options = {
+                    "key": data.key_id,
+                    "amount": data.amount,
+                    "currency": "INR",
+                    "name": "Pujya Astromall",
+                    "description": "Product Purchase",
+                    "order_id": data.razorpay_order_id,
+                    "handler": function (response) {
+                        verifyPayment(response, data.order_id);
+                    },
+                    "prefill": {
+                        "name": data.user_name,
+                        "email": data.user_email
+                    },
+                    "theme": {
+                        "color": "#ab0d0d"
+                    }
+                };
+                var rzp1 = new Razorpay(options);
+                rzp1.on('payment.failed', function (response) {
+                    alert("Payment Failed: " + response.error.description);
+                    btn.disabled = false;
+                    btn.innerHTML = 'Pay & Place Order';
+                });
+                rzp1.open();
+            })
+            .catch(err => {
+                console.error("Init error:", err);
+                btn.disabled = false;
+                btn.innerHTML = 'Pay & Place Order';
+            });
+    }
+
+    function verifyPayment(response, orderId) {
+        fetch("{% url 'astromall:verify_mall_payment' %}", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            body: JSON.stringify({
+                razorpay_order_id: response.razorpay_order_id,
+                razorpay_payment_id: response.razorpay_payment_id,
+                razorpay_signature: response.razorpay_signature,
+                order_id: orderId
+            })
+        })
+            .then(res => res.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    alert("Payment Successful! Your order has been placed.");
+                    window.location.href = "{% url 'accounts:profile' %}";
+                } else {
+                    alert("Payment Verification Failed: " + data.error);
+                    document.getElementById('payButton').disabled = false;
+                    document.getElementById('payButton').innerHTML = 'Pay & Place Order';
+                }
+            });
+    }
+</script>
+{% endblock %}

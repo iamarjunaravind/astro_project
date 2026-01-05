@@ -1,0 +1,187 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-01-05 12:41+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: kn\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "Astrology Platform"
+msgstr "ಜ್ಯೋತಿಷ್ಯ ವೇದಿಕೆ"
+
+msgid "Home"
+msgstr "ಮುಖಪುಟ"
+
+msgid "Chat with Astrologer"
+msgstr "ಜ್ಯೋತಿಷಿಯೊಂದಿಗೆ ಚಾಟ್ ಮಾಡಿ"
+
+msgid "Talk with Astrologer"
+msgstr "ಜ್ಯೋತಿಷಿಯೊಂದಿಗೆ ಚಾಟ್ ಮಾಡಿ"
+
+msgid "Astromall"
+msgstr "ಆಸ್ಟ್ರೋಮಾಲ್"
+
+msgid "Blog"
+msgstr "ಬ್ಲಾಗ್"
+
+msgid "Kundali"
+msgstr "ಕುಂಡಲಿ"
+
+msgid "Horoscopes"
+msgstr "ರಾಶಿಫಲ"
+
+msgid "Today"
+msgstr "ಇಂದು"
+
+msgid "Tomorrow"
+msgstr "ನಾಳೆ"
+
+msgid "Yesterday"
+msgstr "ನಿನ್ನೆ"
+
+msgid "Weekly"
+msgstr "ಸಾಪ್ತಾಹಿಕ"
+
+msgid "Monthly"
+msgstr "ಮಾಸಿಕ"
+
+msgid "Yearly"
+msgstr "ವಾರ್ಷಿಕ"
+
+msgid "Profile"
+msgstr "ಪ್ರೊಫೈಲ್"
+
+msgid "Logout"
+msgstr "ಲಾಗೌಟ್"
+
+msgid "Login"
+msgstr "ಲಾಗಿನ್"
+
+msgid "Menu"
+msgstr "ಮೆನು"
+
+msgid "Astrology"
+msgstr "ಜ್ಯೋತಿಷ್ಯ"
+
+msgid "Kundli"
+msgstr "ಕುಂಡಲಿ"
+
+msgid "Horoscope"
+msgstr "ರಾಶಿಫಲ"
+
+msgid "Compatibility"
+msgstr "ಹೊಂದಾಣಿಕೆ"
+
+msgid "Shop"
+msgstr "ಶಾಪ್"
+
+msgid "Gemstones"
+msgstr "ರತ್ನಗಳು"
+
+msgid "Rudraksha"
+msgstr "ರುದ್ರಾಕ್ಷಿ"
+
+msgid "Contact"
+msgstr "ಸಂಪರ್ಕಿಸಿ"
+
+msgid "24×7 Chat"
+msgstr "24×7 ಚಾಟ್"
+
+msgid "Email Support"
+msgstr "ಇಮೇಲ್ ಬೆಂಬಲ"
+
+msgid "Secure"
+msgstr "ಸುರಕ್ಷಿತ"
+
+msgid "Verified Astrologers"
+msgstr "ಪರಿಶೀಲಿಸಿದ ಜ್ಯೋತಿಷಿಗಳು"
+
+msgid "Secure Payments"
+msgstr "ಸುರಕ್ಷಿತ ಪಾವತಿಗಳು"
+
+msgid "Astrology Platform. All Rights Reserved"
+msgstr "ಜ್ಯೋತಿಷ್ಯ ವೇದಿಕೆ. ಎಲ್ಲಾ ಹಕ್ಕುಗಳನ್ನು ಕಾಯ್ದಿರಿಸಲಾಗಿದೆ"
+
+msgid "Claim FREE gift"
+msgstr "ಉಚಿತ ಉಡುಗೊರೆಯನ್ನು ಪಡೆಯಿರಿ"
+
+msgid "200+ Celebs recommend"
+msgstr "200+ ಸೆಲೆಬ್ರಿಟಿಗಳು ಶಿಫಾರಸು ಮಾಡುತ್ತಾರೆ"
+
+msgid "Chat With Astrologer"
+msgstr "ಜ್ಯೋತಿಷಿಯೊಂದಿಗೆ ಚಾಟ್ ಮಾಡಿ"
+
+msgid "Talk With Astrologer"
+msgstr "ಜ್ಯೋತಿಷಿಯೊಂದಿಗೆ ಚಾಟ್ ಮಾಡಿ"
+
+msgid "Chat Now"
+msgstr "ಈಗ ಚಾಟ್ ಮಾಡಿ"
+
+msgid "Talk Now"
+msgstr "ಈಗ ಚಾಟ್ ಮಾಡಿ"
+
+msgid "Astrologer"
+msgstr "ಜ್ಯೋತಿಷಿ"
+
+msgid "Talk"
+msgstr "ಮಾತನಾಡಿ"
+
+msgid "Talk to Astrologer"
+msgstr "ಜ್ಯೋತಿಷಿಯೊಂದಿಗೆ ಮಾತನಾಡಿ"
+
+msgid "Chat"
+msgstr "ಚಾಟ್"
+
+msgid "Store"
+msgstr "ಸ್ಟೋರ್"
+
+msgid "Pujya Store"
+msgstr "ಪೂಜ್ಯ ಸ್ಟೋರ್"
+
+msgid "Puja"
+msgstr "ಪೂಜೆ"
+
+msgid "Book a Pooja"
+msgstr "ಪೂಜೆಯನ್ನು ಕಾಯ್ದಿರಿಸಿ"
+
+msgid "Total Astrologers"
+msgstr "ಒಟ್ಟು ಜ್ಯೋತಿಷಿಗಳು"
+
+msgid "Minutes"
+msgstr "ನಿಮಿಷಗಳು"
+
+msgid "Customers"
+msgstr "ಗ್ರಾಹಕರು"
+
+msgid "OUR ASTROLOGY SERVICES"
+msgstr "ನಮ್ಮ ಜ್ಯೋತಿಷ್ಯ ಸೇವೆಗಳು"
+
+msgid "min"
+msgstr "ನಿಮಿಷ"
+
+msgid "Consult"
+msgstr "ಸಮಾಲೋಚಿಸಿ"
+
+msgid "No astrologers found."
+msgstr "ಯಾವುದೇ ಜ್ಯೋತಿಷಿಗಳು ಕಂಡುಬಂದಿಲ್ಲ."
+
+msgid "TOP SELLING PRODUCTS"
+msgstr "ಅತಿ ಹೆಚ್ಚು ಮಾರಾಟವಾಗುವ ಉತ್ಪನ್ನಗಳು"
+
+msgid "Buy Now"
+msgstr "ಈಗ ಖರೀದಿಸಿ"
+
+msgid "No products found."
+msgstr "ಯಾವುದೇ ಉತ್ಪನ್ನಗಳು ಕಂಡುಬಂದಿಲ್ಲ."
+
+msgid "View All Products"
+msgstr "ಎಲ್ಲಾ ಉತ್ಪನ್ನಗಳನ್ನು ವೀಕ್ಷಿಸಿ"
+
+msgid "Blogs"
+msgstr "ಬ್ಲಾಗ್‌ಗಳು"

@@ -1,0 +1,187 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-01-05 12:41+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: ta\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "Astrology Platform"
+msgstr "ஜோதிட தளம்"
+
+msgid "Home"
+msgstr "முகப்பு"
+
+msgid "Chat with Astrologer"
+msgstr "ஜோதிடருடன் அரட்டை அடிக்கவும்"
+
+msgid "Talk with Astrologer"
+msgstr "ஜோதிடருடன் அரட்டை அடிக்கவும்"
+
+msgid "Astromall"
+msgstr "ஆஸ்ட்ரோமால்"
+
+msgid "Blog"
+msgstr "வலைப்பதிவு"
+
+msgid "Kundali"
+msgstr "ஜாதகம்"
+
+msgid "Horoscopes"
+msgstr "ராசிபலன்"
+
+msgid "Today"
+msgstr "இன்று"
+
+msgid "Tomorrow"
+msgstr "நாளை"
+
+msgid "Yesterday"
+msgstr "நேற்று"
+
+msgid "Weekly"
+msgstr "வாராந்திரம்"
+
+msgid "Monthly"
+msgstr "மாதாந்திர"
+
+msgid "Yearly"
+msgstr "ஆண்டு"
+
+msgid "Profile"
+msgstr "சுயவிவரம்"
+
+msgid "Logout"
+msgstr "வெளியேறு"
+
+msgid "Login"
+msgstr "உள்நுழை"
+
+msgid "Menu"
+msgstr "பட்டியல்"
+
+msgid "Astrology"
+msgstr "ஜோதிடம்"
+
+msgid "Kundli"
+msgstr "ஜாதகம்"
+
+msgid "Horoscope"
+msgstr "ராசிபலன்"
+
+msgid "Compatibility"
+msgstr "பொருத்தம்"
+
+msgid "Shop"
+msgstr "கடை"
+
+msgid "Gemstones"
+msgstr "நவரத்தினங்கள்"
+
+msgid "Rudraksha"
+msgstr "ருத்ராட்சம்"
+
+msgid "Contact"
+msgstr "தொடர்பு கொள்க"
+
+msgid "24×7 Chat"
+msgstr "24×7 அரட்டை"
+
+msgid "Email Support"
+msgstr "மின்னஞ்சல் ஆதரவு"
+
+msgid "Secure"
+msgstr "பாதுகாப்பானது"
+
+msgid "Verified Astrologers"
+msgstr "சரிபார்க்கப்பட்ட ஜோதிடர்கள்"
+
+msgid "Secure Payments"
+msgstr "பாதுகாப்பான கொடுப்பனவுகள்"
+
+msgid "Astrology Platform. All Rights Reserved"
+msgstr "ஜோதிட தளம். அனைத்து உரிமைகளும் பாதுகாக்கப்பட்டவை"
+
+msgid "Claim FREE gift"
+msgstr "இலவச பரிசைப் பெறுங்கள்"
+
+msgid "200+ Celebs recommend"
+msgstr "200+ பிரபலங்கள் பரிந்துரைக்கின்றனர்"
+
+msgid "Chat With Astrologer"
+msgstr "ஜோதிடருடன் அரட்டை அடிக்கவும்"
+
+msgid "Talk With Astrologer"
+msgstr "ஜோதிடருடன் அரட்டை அடிக்கவும்"
+
+msgid "Chat Now"
+msgstr "இப்போது அரட்டை அடிக்கவும்"
+
+msgid "Talk Now"
+msgstr "இப்போது அரட்டை அடிக்கவும்"
+
+msgid "Astrologer"
+msgstr "ஜோதிடர்"
+
+msgid "Talk"
+msgstr "பேசுங்கள்"
+
+msgid "Talk to Astrologer"
+msgstr "ஜோதிடருடன் பேசுங்கள்"
+
+msgid "Chat"
+msgstr "அரட்டை"
+
+msgid "Store"
+msgstr "ஸ்டோர்"
+
+msgid "Pujya Store"
+msgstr "பூஜ்ய ஸ்டோர்"
+
+msgid "Puja"
+msgstr "பூஜை"
+
+msgid "Book a Pooja"
+msgstr "ஒரு பூஜையை முன்பதிவு செய்யுங்கள்"
+
+msgid "Total Astrologers"
+msgstr "மொத்த ஜோதிடர்கள்"
+
+msgid "Minutes"
+msgstr "நிமிடங்கள்"
+
+msgid "Customers"
+msgstr "வாடிக்கையாளர்கள்"
+
+msgid "OUR ASTROLOGY SERVICES"
+msgstr "எங்கள் ஜோதிட சேவைகள்"
+
+msgid "min"
+msgstr "நிமிடம்"
+
+msgid "Consult"
+msgstr "ஆலோசனை"
+
+msgid "No astrologers found."
+msgstr "ஜோதிடர்கள் யாரும் காணப்படவில்லை."
+
+msgid "TOP SELLING PRODUCTS"
+msgstr "அதிக விற்பனையான தயாரிப்புகள்"
+
+msgid "Buy Now"
+msgstr "இப்போது வாங்க"
+
+msgid "No products found."
+msgstr "தயாரிப்புகள் எதுவும் காணப்படவில்லை."
+
+msgid "View All Products"
+msgstr "அனைத்து தயாரிப்புகளையும் காண்க"
+
+msgid "Blogs"
+msgstr "வலைப்பதிவுகள்"

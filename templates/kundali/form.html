@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+    .text-theme {
+        color: #ab0d0d !important;
+    }
+
+    .btn-theme {
+        background-color: #ab0d0d;
+        border-color: #ab0d0d;
+        color: #fff;
+    }
+
+    .btn-theme:hover {
+        background-color: #8c0a0a;
+        border-color: #8c0a0a;
+        color: #fff;
+    }
+
+    .form-control:focus {
+        border-color: #ab0d0d;
+        box-shadow: 0 0 0 0.25rem rgba(171, 13, 13, 0.25);
+    }
+</style>
+<section class="py-5 bg-light-subtle">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-6">
+                <div class="card shadow-sm border-0">
+                    <div class="card-body p-4 p-md-5">
+                        <div class="text-center mb-4">
+                            <h1 class="fw-bold text-theme">Generate Your Kundali</h1>
+                            <p class="text-muted">Enter your birth details to generate your Janam Kundali chart.</p>
+                        </div>
+
+                        <form method="post" class="row g-3">
+                            {% csrf_token %}
+
+                            <div class="col-12">
+                                <label class="form-label fw-semibold">Full Name</label>
+                                {{ form.name }}
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Gender</label>
+                                {{ form.gender }}
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">City</label>
+                                {{ form.city }}
+                            </div>
+
+                            <div class="col-12">
+                                <label class="form-label fw-semibold">Date of Birth</label>
+                                <div class="input-group">
+                                    {{ form.day }}
+                                    {{ form.month }}
+                                    {{ form.year }}
+                                </div>
+                            </div>
+
+                            <div class="col-12">
+                                <label class="form-label fw-semibold">Time of Birth</label>
+                                <div class="input-group">
+                                    {{ form.hour }}
+                                    {{ form.minute }}
+                                </div>
+                                <div class="form-text">Please use 24-hour format (e.g., 14 for 2 PM).</div>
+                            </div>
+
+                            <div class="col-12 mt-4">
+                                <button type="submit" class="btn btn-theme w-100 py-3 fw-bold shadow-sm">
+                                    <i class="bi bi-stars me-2"></i> Generate Kundali
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

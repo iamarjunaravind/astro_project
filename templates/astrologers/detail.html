@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container section">
+    <div class="card p-4 mx-auto" style="max-width: 900px; border: 1px solid #eee;">
+        <div class="row g-4">
+
+            <div class="col-md-4 text-center border-end">
+                <div style="width: 150px; height: 150px; margin: 0 auto 20px;">
+                    <img src="{% static 'img/default_avatar.png' %}" alt="Avatar"
+                        style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
+                </div>
+                <h2 class="text-warning">★ {{ astrologer.rating }}</h2>
+                <p class="text-muted">Rating</p>
+                <div class="row text-center mb-3">
+                    <div class="col-6 border-end">
+                        <p class="text-muted mb-1">Chat Price</p>
+                        <h4 class="text-danger">₹{{ astrologer.chat_price_per_minute }}/min</h4>
+                    </div>
+                    <div class="col-6">
+                        <p class="text-muted mb-1">Call Price</p>
+                        <h4 class="text-danger">₹{{ astrologer.call_price_per_minute }}/min</h4>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-8">
+                <h1 class="text-start text-dark mb-2">{{ astrologer.user.username }}</h1>
+                <p class="mb-4">Experience: <strong>{{ astrologer.experience_years }} Years</strong></p>
+
+                <div class="mb-4">
+                    <h5 class="text-danger">Skills</h5>
+                    <div class="d-flex gap-2 flex-wrap">
+                        {% for skill in astrologer.skills.all %}
+                        <span class="badge bg-light text-dark border px-3 py-2 rounded-pill">{{ skill.name }}</span>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <h5 class="text-danger">Languages</h5>
+                    <div class="d-flex gap-2 flex-wrap">
+                        {% for language in astrologer.languages.all %}
+                        <span class="badge bg-light text-dark border px-3 py-2 rounded-pill">{{ language.name }}</span>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <h5 class="text-danger">About Me</h5>
+                    <p class="text-muted">{{ astrologer.bio }}</p>
+                </div>
+
+                <div class="d-flex gap-3">
+                    <a href="{% url 'consultations:start_chat' astrologer.id %}"
+                        class="btn btn-outline-danger btn-lg rounded-pill px-5">Chat Now</a>
+                    <a href="{% url 'consultations:book_astrologer' astrologer.id %}?type=call"
+                        class="btn btn-danger btn-lg rounded-pill px-5">Call Now</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

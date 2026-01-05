@@ -1,0 +1,183 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row mb-4">
+        <div class="col">
+            <h2 class="fw-bold">{% trans "Astrologer Dashboard" %}</h2>
+            <p class="text-muted">{% trans "Manage your bookings and chats" %}</p>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Active Chats -->
+        <div class="col-lg-4 mb-4">
+            <div class="card h-100 shadow-sm border-0">
+                <div class="card-header bg-white border-0 py-3">
+                    <h5 class="mb-0 fw-bold">{% trans "Active Chats" %}</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="list-group list-group-flush">
+                        {% for session in active_sessions %}
+                        <a href="{% url 'consultations:chat_room' session.id %}"
+                            class="list-group-item list-group-item-action py-3 d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="mb-1">{{ session.customer.username }}</h6>
+                                <small class="text-muted">{% trans "Started" %} {{ session.start_time|timesince }} {% trans "ago" %}</small>
+                            </div>
+                            <span class="badge bg-success rounded-pill">{% trans "Active" %}</span>
+                        </a>
+                        {% empty %}
+                        <div class="p-4 text-center text-muted">
+                            <p class="mb-0">{% trans "No active chat sessions." %}</p>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bookings -->
+        <div class="col-lg-8 mb-4">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-white border-0 py-3 d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0 fw-bold">{% trans "Recent Bookings" %}</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="bg-light">
+                                <tr>
+                                    <th class="ps-4">{% trans "Customer" %}</th>
+                                    <th>{% trans "Scheduled For" %}</th>
+                                    <th>{% trans "Phone" %}</th>
+                                    <th>{% trans "Status" %}</th>
+                                    <th class="text-end pe-4">{% trans "Actions" %}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for booking in bookings %}
+                                <tr>
+                                    <td class="ps-4">
+                                        <div class="fw-bold">{{ booking.user.username }}</div>
+                                        <small class="text-muted">{{ booking.user.email }}</small>
+                                    </td>
+                                    <td>
+                                        <div>{{ booking.scheduled_at|date:"M d, Y" }}</div>
+                                        <small class="text-muted">{{ booking.scheduled_at|date:"h:i A" }}</small>
+                                    </td>
+                                    <td>
+
+                                        {% if booking.user.profile.phone_number %}
+
+                                        <a href="tel:{{ booking.user.profile.phone_number }}"
+                                            class="text-decoration-none">
+                                            <i class="bi bi-telephone-fill me-1"></i>
+                                            {{ booking.user.profile.phone_number }}
+                                        </a>
+                                        {% else %}
+                                        <span class="text-muted">-</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if booking.status == 'pending' %}
+                                        <span class="badge bg-warning text-dark">{% trans "Pending" %}</span>
+                                        {% elif booking.status == 'approved' %}
+                                        <span class="badge bg-info">{% trans "Approved" %}</span>
+                                        {% elif booking.status == 'completed' %}
+                                        <span class="badge bg-success">{% trans "Completed" %}</span>
+                                        {% else %}
+                                        <span class="badge bg-secondary">{{ booking.status|capfirst }}</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-end pe-4">
+                                        {% if booking.status == 'completed' %}
+                                        <span class="badge bg-success">
+                                            <i class="bi bi-check-circle-fill me-1"></i> {% trans "Completed" %}
+                                        </span>
+                                        {% elif booking.consultation_type == 'chat' %}
+                                        <a href="{% url 'consultations:start_chat_from_booking' booking.id %}"
+                                            class="btn btn-sm btn-primary rounded-pill">
+                                            <i class="bi bi-chat-dots-fill me-1"></i> {% trans "Chat Now" %}
+                                        </a>
+                                        {% elif booking.consultation_type == 'call' %}
+                                        <div class="dropdown d-inline-block">
+                                            <button class="btn btn-sm btn-outline-dark dropdown-toggle rounded-pill"
+                                                type="button" id="manageCall{{ booking.id }}" data-bs-toggle="dropdown"
+                                                aria-expanded="false">
+                                                <i class="bi bi-gear-fill me-1"></i> {% trans "Manage" %}
+                                            </button>
+                                            <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0"
+                                                aria-labelledby="manageCall{{ booking.id }}">
+                                                <li>
+                                                    <a href="{% url 'consultations:start_call_booking' booking.id %}"
+                                                        class="dropdown-item start-call-btn disabled text-success"
+                                                        data-scheduled="{{ booking.scheduled_at|date:'c' }}">
+                                                        <i class="bi bi-telephone-fill me-2"></i> {% trans "Start Call" %}
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a href="{% url 'consultations:reschedule_booking' booking.id %}"
+                                                        class="dropdown-item text-warning">
+                                                        <i class="bi bi-calendar-event me-2"></i> {% trans "Reschedule" %}
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <hr class="dropdown-divider">
+                                                </li>
+                                                <li>
+                                                    <a href="{% url 'consultations:complete_booking' booking.id %}"
+                                                        class="dropdown-item text-primary">
+                                                        <i class="bi bi-check-circle-fill me-2"></i> {% trans "Mark Completed" %}
+                                                    </a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                        {% else %}
+                                        <button class="btn btn-sm btn-outline-dark rounded-pill">{% trans "Manage" %}</button>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="4" class="text-center py-4 text-muted">
+                                        {% trans "No bookings found." %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function updateCallButtons() {
+        const now = new Date();
+        document.querySelectorAll('.start-call-btn').forEach(btn => {
+            const scheduledTime = new Date(btn.dataset.scheduled);
+            const diffMs = scheduledTime - now;
+            const diffMins = diffMs / (1000 * 60);
+
+            // Enable if within 2 minutes of scheduled time (or if past scheduled time)
+            if (diffMins <= 2) {
+                btn.classList.remove('disabled');
+                btn.classList.add('btn-success');
+                btn.classList.remove('btn-secondary');
+            } else {
+                btn.classList.add('disabled');
+                btn.classList.add('btn-secondary');
+                btn.classList.remove('btn-success');
+            }
+        });
+    }
+
+    // Update every 30 seconds
+    updateCallButtons();
+    setInterval(updateCallButtons, 30000);
+</script>
+{% endblock %}

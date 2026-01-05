@@ -1,0 +1,197 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row mb-4">
+        <div class="col">
+            <h2 class="fw-bold">{% trans "My Consultations" %}</h2>
+            <p class="text-muted">{% trans "View and manage your bookings with astrologers" %}</p>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow-sm border-0">
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="bg-light">
+                                <tr>
+                                    <th class="ps-4">{% trans "Astrologer" %}</th>
+                                    <th>{% trans "Scheduled For" %}</th>
+                                    <th>{% trans "Status" %}</th>
+                                    <th class="text-end pe-4">{% trans "Actions" %}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for booking in bookings %}
+                                <tr>
+                                    <td class="ps-4">
+                                        <div class="fw-bold">{{ booking.astrologer.user.username }}</div>
+                                        <small class="text-muted">{{ booking.astrologer.experience_years }} {% trans "years exp" %}</small>
+                                    </td>
+                                    <td>
+                                        <div>{{ booking.scheduled_at|date:"M d, Y" }}</div>
+                                        <small class="text-muted">{{ booking.scheduled_at|date:"h:i A" }}</small>
+                                    </td>
+                                    <td>
+                                        {% if booking.status == 'pending' %}
+                                        <span class="badge bg-warning text-dark">{% trans "Pending" %}</span>
+                                        {% elif booking.status == 'approved' %}
+                                        <span class="badge bg-info">{% trans "Approved" %}</span>
+                                        {% elif booking.status == 'completed' %}
+                                        <span class="badge bg-success">{% trans "Completed" %}</span>
+                                        {% elif booking.status == 'reschedule_proposed' %}
+                                        <span class="badge bg-primary">{% trans "Reschedule Proposed" %}</span>
+                                        {% else %}
+                                        <span class="badge bg-secondary">{{ booking.status|capfirst }}</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-end pe-4">
+                                        {% if booking.status == 'completed' %}
+                                        {% if booking.is_reviewed %}
+                                        <span class="badge bg-success">
+                                            <i class="bi bi-star-fill me-1"></i> {% trans "Rated" %}
+                                        </span>
+                                        {% else %}
+                                        <span class="badge bg-success mb-1">
+                                            <i class="bi bi-check-circle-fill me-1"></i> {% trans "Completed" %}
+                                        </span>
+                                        <button type="button" class="btn btn-sm btn-outline-warning rounded-pill mt-1"
+                                            data-bs-toggle="modal" data-bs-target="#reviewModal_{{ booking.id }}">
+                                            <i class="bi bi-star me-1"></i> {% trans "Rate" %}
+                                        </button>
+
+                                        <!-- Review Modal -->
+                                        <div class="modal fade" id="reviewModal_{{ booking.id }}" tabindex="-1"
+                                            aria-hidden="true">
+                                            <div class="modal-dialog">
+                                                <div class="modal-content">
+                                                    <form method="POST"
+                                                        action="{% url 'consultations:submit_review' booking.id %}">
+                                                        {% csrf_token %}
+                                                        <div class="modal-header">
+                                                            <h5 class="modal-title">Rate {{ booking.astrologer.user.username }}</h5>
+                                                            <button type="button" class="btn-close"
+                                                                data-bs-dismiss="modal" aria-label="Close"></button>
+                                                        </div>
+                                                        <div class="modal-body text-start">
+                                                            <div class="mb-3 text-center">
+                                                                <label class="form-label d-block">Rating</label>
+                                                                <div class="btn-group" role="group">
+                                                                    <input type="radio" class="btn-check" name="rating"
+                                                                        id="rating_{{ booking.id }}_1" value="1"
+                                                                        required>
+                                                                    <label class="btn btn-outline-warning"
+                                                                        for="rating_{{ booking.id }}_1">1</label>
+
+                                                                    <input type="radio" class="btn-check" name="rating"
+                                                                        id="rating_{{ booking.id }}_2" value="2">
+                                                                    <label class="btn btn-outline-warning"
+                                                                        for="rating_{{ booking.id }}_2">2</label>
+
+                                                                    <input type="radio" class="btn-check" name="rating"
+                                                                        id="rating_{{ booking.id }}_3" value="3">
+                                                                    <label class="btn btn-outline-warning"
+                                                                        for="rating_{{ booking.id }}_3">3</label>
+
+                                                                    <input type="radio" class="btn-check" name="rating"
+                                                                        id="rating_{{ booking.id }}_4" value="4">
+                                                                    <label class="btn btn-outline-warning"
+                                                                        for="rating_{{ booking.id }}_4">4</label>
+
+                                                                    <input type="radio" class="btn-check" name="rating"
+                                                                        id="rating_{{ booking.id }}_5" value="5">
+                                                                    <label class="btn btn-outline-warning"
+                                                                        for="rating_{{ booking.id }}_5">5</label>
+                                                                </div>
+                                                            </div>
+                                                            <div class="mb-3">
+                                                                <label class="form-label">Review (Optional)</label>
+                                                                <textarea name="comment" class="form-control"
+                                                                    rows="3"></textarea>
+                                                            </div>
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                            <button type="submit"
+                                                                class="btn btn-primary">Submit</button>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        {% endif %}
+                                        {% elif booking.status == 'reschedule_proposed' %}
+                                        <div class="mb-2 small fw-bold text-primary">
+                                            <div class="mb-1 text-muted text-uppercase" style="font-size: 0.75rem;">{% trans "New Proposed Time" %}</div>
+                                            {{ booking.proposed_reschedule_time|date:"M d, h:i A" }}
+                                        </div>
+                                        <form method="POST"
+                                            action="{% url 'consultations:handle_reschedule' booking.id %}">
+                                            {% csrf_token %}
+                                            <button type="submit" name="action" value="accept"
+                                                class="btn btn-sm btn-success rounded-pill mb-1 d-block w-100">
+                                                <i class="bi bi-check-lg me-1"></i> {% trans "Accept New Time" %}
+                                            </button>
+                                            <button type="submit" name="action" value="reject"
+                                                class="btn btn-sm btn-outline-danger rounded-pill d-block w-100">
+                                                <i class="bi bi-x-lg me-1"></i> {% trans "Reject Proposal" %}
+                                            </button>
+                                        </form>
+                                        {% elif booking.status == 'approved' %}
+                                        {% if booking.consultation_type == 'chat' %}
+                                        <a href="{% url 'consultations:start_chat' booking.astrologer.id %}"
+                                            class="btn btn-sm btn-danger rounded-pill">
+                                            <i class="bi bi-chat-dots-fill me-1"></i> {% trans "Chat Now" %}
+                                        </a>
+                                        {% elif booking.consultation_type == 'call' %}
+                                        <a href="{% url 'consultations:call_room' booking.id %}"
+                                            class="btn btn-sm btn-success rounded-pill start-call-btn disabled"
+                                            data-scheduled="{{ booking.scheduled_at|date:'c' }}">
+                                            <i class="bi bi-telephone-fill me-1"></i> {% trans "Join Call" %}
+                                        </a>
+                                        {% endif %}
+                                        {% else %}
+                                        <button class="btn btn-sm btn-outline-secondary rounded-pill" disabled>{% trans "Details" %}</button>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="4" class="text-center py-5 text-muted">
+                                        <p class="mb-3">{% trans "You haven't booked any consultations yet." %}</p>
+                                        <a href="{% url 'astrologers:astrologer_list' %}"
+                                            class="btn btn-dark rounded-pill">{% trans "Browse Astrologers" %}</a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function updateCallButtons() {
+        const now = new Date();
+        document.querySelectorAll('.start-call-btn').forEach(btn => {
+            const scheduledTime = new Date(btn.dataset.scheduled);
+            const diffMs = scheduledTime - now;
+            const diffMins = diffMs / (1000 * 60);
+
+            if (diffMins <= 2) {
+                btn.classList.remove('disabled');
+            } else {
+                btn.classList.add('disabled');
+            }
+        });
+    }
+
+    updateCallButtons();
+    setInterval(updateCallButtons, 30000);
+</script>
+{% endblock %}

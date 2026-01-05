@@ -1,0 +1,284 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5 mb-5">
+    <div class="row">
+        <!-- Sidebar/Profile Summary -->
+        <div class="col-lg-4 mb-4">
+            <div class="card shadow-sm border-0 text-center p-4">
+                <div class="mb-3">
+                    <i class="bi bi-person-circle text-danger" style="font-size: 5rem;"></i>
+                </div>
+                <h3 class="fw-bold">{{ user.username }}</h3>
+                <p class="text-muted">{{ user.email }}</p>
+                <hr>
+                <div class="d-grid gap-2">
+                    <a href="{% url 'accounts:logout' %}" class="btn btn-outline-danger btn-sm rounded-pill">Logout</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content (Tabs) -->
+        <div class="col-lg-8">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-white border-0 p-0">
+                    <ul class="nav nav-tabs nav-fill" id="profileTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active fw-bold py-3" id="dashboard-tab" data-bs-toggle="tab"
+                                data-bs-target="#dashboard" type="button" role="tab" aria-controls="dashboard"
+                                aria-selected="true">
+                                <i class="bi bi-speedometer2 me-2"></i> Dashboard
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link fw-bold py-3" id="orders-tab" data-bs-toggle="tab"
+                                data-bs-target="#orders" type="button" role="tab" aria-controls="orders"
+                                aria-selected="false">
+                                <i class="bi bi-bag-check me-2"></i> My Orders
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link fw-bold py-3" id="consultations-tab" data-bs-toggle="tab"
+                                data-bs-target="#consultations" type="button" role="tab" aria-controls="consultations"
+                                aria-selected="false">
+                                <i class="bi bi-calendar-event me-2"></i> My Consultations
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link fw-bold py-3" id="wallet-tab" data-bs-toggle="tab"
+                                data-bs-target="#wallet" type="button" role="tab" aria-controls="wallet"
+                                aria-selected="false">
+                                <i class="bi bi-wallet2 me-2"></i> Wallet
+                            </button>
+                        </li>
+                    </ul>
+                </div>
+                <div class="card-body p-4">
+                    <div class="tab-content" id="profileTabsContent">
+
+                        <!-- Dashboard Tab -->
+                        <div class="tab-pane fade show active" id="dashboard" role="tabpanel"
+                            aria-labelledby="dashboard-tab">
+                            <h5 class="fw-bold mb-4">Account Overview</h5>
+                            {% if user.astrologer_profile %}
+                            <div class="alert alert-info border-0 shadow-sm">
+                                <h6 class="fw-bold"><i class="bi bi-star-fill me-2"></i>Astrologer Profile Active</h6>
+                                <p class="mb-0">
+                                    Your rates:
+                                    Chat: <strong>₹{{ user.astrologer_profile.chat_price_per_minute }}/min</strong> |
+                                    Call: <strong>₹{{ user.astrologer_profile.call_price_per_minute }}/min</strong>
+                                </p>
+                            </div>
+                            {% endif %}
+
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <div class="p-3 border rounded bg-light">
+                                        <small class="text-muted d-block">Member Since</small>
+                                        <span class="fw-bold">{{ user.date_joined|date:"M d, Y" }}</span>
+                                    </div>
+                                </div>
+                                <div class="p-3 border rounded bg-light">
+                                    <small class="text-muted d-block">Total Orders</small>
+                                    <span class="fw-bold">{{ orders.count }}</span>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mt-3">
+                                <div class="p-3 border rounded bg-light">
+                                    <small class="text-muted d-block">Wallet Balance</small>
+                                    <span class="fw-bold text-success">₹{{ user.profile.wallet_balance }}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mt-4">
+                            <h6 class="fw-bold mb-3">Recent Consultations</h6>
+                            <p class="text-muted italic small">No recent consultations found.</p>
+                        </div>
+                    </div>
+
+                    <!-- Orders Tab -->
+                    <div class="tab-pane fade" id="orders" role="tabpanel" aria-labelledby="orders-tab">
+                        ...
+                    </div>
+
+                    <!-- Consultations Tab -->
+                    <div class="tab-pane fade" id="consultations" role="tabpanel" aria-labelledby="consultations-tab">
+                        <h5 class="fw-bold mb-4">My Consultations</h5>
+                        {% if bookings %}
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle">
+                                <thead class="bg-light">
+                                    <tr>
+                                        <th>Astrologer</th>
+                                        <th>Scheduled For</th>
+                                        <th>Type</th>
+                                        <th>Status</th>
+                                        <th class="text-end">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for booking in bookings %}
+                                    <tr>
+                                        <td>
+                                            <div class="fw-bold">{{ booking.astrologer.user.username }}</div>
+                                        </td>
+                                        <td class="small">
+                                            {{ booking.scheduled_at|date:"M d, Y h:i A" }}
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-light text-dark border">{{ booking.get_consultation_type_display }}</span>
+                                        </td>
+                                        <td>
+                                            <span
+                                                class="badge {% if booking.status == 'approved' %}bg-info{% elif booking.status == 'completed' %}bg-success{% else %}bg-warning{% endif %} rounded-pill">
+                                                {{ booking.status|capfirst }}
+                                            </span>
+                                        </td>
+                                        <td class="text-end">
+                                            {% if booking.status == 'approved' %}
+                                            {% if booking.consultation_type == 'chat' %}
+                                            <a href="{% url 'consultations:start_chat' booking.astrologer.id %}"
+                                                class="btn btn-danger btn-sm rounded-pill">Chat Now</a>
+                                            {% elif booking.consultation_type == 'call' %}
+                                            <a href="{% url 'consultations:call_room' booking.id %}"
+                                                class="btn btn-success btn-sm rounded-pill">Join Call</a>
+                                            {% endif %}
+                                            {% elif booking.status == 'completed' %}
+                                            <i class="bi bi-check-circle-fill text-success"></i>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        {% else %}
+                        <div class="text-center py-4">
+                            <i class="bi bi-calendar-x text-muted" style="font-size: 3rem;"></i>
+                            <p class="mt-3">You haven't booked any consultations yet.</p>
+                            <a href="{% url 'astrologers:astrologer_list' %}" class="btn btn-danger btn-sm"
+                                style="background-color: #ab0d0d;">Find Astrologer</a>
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Wallet Tab -->
+                    <div class="tab-pane fade" id="wallet" role="tabpanel" aria-labelledby="wallet-tab">
+                        <h5 class="fw-bold mb-4">My Wallet</h5>
+                        <div class="card bg-danger text-white border-0 shadow"
+                            style="background: linear-gradient(45deg, #ab0d0d, #d61a1a);">
+                            <div class="card-body p-4 text-center">
+                                <small class="opacity-75">Available Balance</small>
+                                <h2 class="display-5 fw-bold mb-3">₹{{ user.profile.wallet_balance|default:"0.00" }}
+                                </h2>
+                                <button class="btn btn-light fw-bold px-4 rounded-pill" data-bs-toggle="modal"
+                                    data-bs-target="#rechargeModal">Add Money</button>
+                            </div>
+                        </div>
+
+                        <!-- Recharge Modal -->
+                        <div class="modal fade" id="rechargeModal" tabindex="-1" aria-labelledby="rechargeModalLabel"
+                            aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered">
+                                <div class="modal-content border-0 shadow">
+                                    <div class="modal-header border-0 pb-0">
+                                        <h5 class="modal-title fw-bold" id="rechargeModalLabel">Recharge Wallet</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                            aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body p-4">
+                                        <div class="mb-3">
+                                            <label class="form-label text-muted small">Enter Amount (₹)</label>
+                                            <div class="input-group input-group-lg">
+                                                <span class="input-group-text bg-white border-end-0">₹</span>
+                                                <input type="number" id="rechargeAmount"
+                                                    class="form-control border-start-0" placeholder="0.00" min="1"
+                                                    step="0.01">
+                                            </div>
+                                        </div>
+                                        <div class="d-grid">
+                                            <button type="button" id="payButton"
+                                                class="btn btn-danger btn-lg rounded-pill"
+                                                style="background-color: #ab0d0d; border: none;">
+                                                Add Money
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-4">
+                            <h6 class="fw-bold mb-3">Recent Transactions</h6>
+                            {% if transactions %}
+                            <div class="table-responsive">
+                                <table class="table table-hover align-middle">
+                                    <thead class="bg-light">
+                                        <tr>
+                                            <th>Date</th>
+                                            <th>Description</th>
+                                            <th>Type</th>
+                                            <th class="text-end">Amount</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for transaction in transactions %}
+                                        <tr>
+                                            <td>
+                                                <div class="fw-bold">{{ transaction.timestamp|date:"M d, Y" }}</div>
+                                                <small class="text-muted">{{ transaction.timestamp|date:"h:i A" }}</small>
+                                            </td>
+                                            <td>{{ transaction.description }}</td>
+                                            <td>
+                                                {% if transaction.transaction_type == 'credit' %}
+                                                <span class="badge bg-success rounded-pill">Credit</span>
+                                                {% else %}
+                                                <span class="badge bg-danger rounded-pill">Debit</span>
+                                                {% endif %}
+                                            </td>
+                                            <td
+                                                class="text-end fw-bold {% if transaction.transaction_type == 'credit' %}text-success{% else %}text-danger{% endif %}">
+                                                {% if transaction.transaction_type == 'credit' %}+{% else %}-{% endif %}₹{{ transaction.amount }}
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                            {% else %}
+                            <p class="text-muted small">No recent transactions found.</p>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+
+<style>
+    .nav-tabs .nav-link {
+        color: #6c757d;
+        border: none;
+        border-bottom: 3px solid transparent;
+        transition: all 0.3s;
+    }
+
+    .nav-tabs .nav-link.active {
+        color: #ab0d0d !important;
+        border-bottom-color: #ab0d0d !important;
+        background: transparent;
+    }
+
+    .nav-tabs .nav-link:hover {
+        border-bottom-color: #dee2e6;
+    }
+
+    .badge.bg-warning {
+        background-color: #ffc107 !important;
+        color: #212529;
+    }
+</style>
+{% endblock %}

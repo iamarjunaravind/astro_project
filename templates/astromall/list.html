@@ -1,0 +1,128 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<style>
+    .category-scroll {
+        display: flex;
+        overflow-x: auto;
+        white-space: nowrap;
+        padding-bottom: 15px;
+        -webkit-overflow-scrolling: touch;
+        gap: 10px;
+        justify-content: flex-start;
+    }
+
+    .category-scroll::-webkit-scrollbar {
+        display: none;
+    }
+
+    @media (min-width: 992px) {
+        .category-scroll {
+            justify-content: center;
+            overflow-x: visible;
+            flex-wrap: wrap;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .container.section {
+            padding-top: 20px;
+        }
+
+        .row.g-4 {
+            --bs-gutter-x: 0.5rem;
+            --bs-gutter-y: 0.5rem;
+        }
+
+        .card.p-2 {
+            padding: 8px !important;
+        }
+
+        .card img {
+            height: 120px !important;
+            object-fit: cover;
+        }
+
+        .card h5 {
+            font-size: 13px;
+            margin-bottom: 5px;
+        }
+
+        .card p.fs-5 {
+            font-size: 13px !important;
+            margin-bottom: 5px;
+        }
+
+        .card p.text-muted {
+            font-size: 9px !important;
+            margin-bottom: 10px;
+        }
+
+        .card .btn-sm {
+            font-size: 10px;
+            padding: 4px 8px;
+        }
+
+        .astromall-title {
+            font-size: 24px;
+            margin-bottom: 15px;
+        }
+    }
+</style>
+
+<div class="container section">
+    <h1 class="text-center mb-4 astromall-title">Astromall</h1>
+
+    <!-- Search Section -->
+    <form method="GET" class="d-flex gap-2 mb-4 justify-content-center px-2">
+        <input type="text" name="q" class="form-control w-auto" placeholder="Search..." value="{{ request.GET.q }}">
+        {% if active_category %}
+        <input type="hidden" name="category" value="{{ active_category }}">
+        {% endif %}
+        <button type="submit" class="btn btn-dark btn-sm">Search</button>
+    </form>
+
+    <!-- Filter Categories -->
+    <div class="category-scroll mb-5 px-2">
+        <a href="{% url 'astromall:product_list' %}{% if request.GET.q %}?q={{ request.GET.q }}{% endif %}"
+            class="btn btn-sm {% if not active_category %}btn-dark{% else %}btn-outline-dark{% endif %} rounded-pill px-4">All</a>
+        {% for cat in categories %}
+        <a href="?category={{ cat.name }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}"
+            class="btn btn-sm {% if active_category == cat.name %}btn-dark{% else %}btn-outline-dark{% endif %} rounded-pill px-4">{{
+            cat.name }}</a>
+        {% endfor %}
+    </div>
+
+    <div class="row g-4 px-1">
+        {% for product in products %}
+        <div class="col-lg-3 col-md-4 col-6">
+            <div class="card h-100 border p-2">
+                {% if product.image %}
+                <img src="{{ product.image.url }}" alt="{{ product.name }}" class="rounded mb-2"
+                    style="height: 180px; object-fit: cover;">
+                {% else %}
+                <img src="{% static 'img/default_product.png' %}" alt="{{ product.name }}" class="rounded mb-2"
+                    style="height: 180px; object-fit: cover;">
+                {% endif %}
+                <h5>{{ product.name }}</h5>
+                <p class="text-danger fs-5 fw-bold mb-1">₹{{ product.price }}</p>
+                <p class="text-muted small d-none d-sm-block">{{ product.description|truncatewords:8 }}</p>
+                <div class="mt-auto d-flex flex-column gap-2">
+                    <a href="{% url 'astromall:product_detail' product.pk %}"
+                        class="btn btn-sm btn-outline-dark rounded-pill">Details</a>
+                    <div class="d-flex gap-1">
+                        <a href="{% url 'astromall:buy_now' product.id %}"
+                            class="btn btn-sm btn-danger rounded-pill flex-grow-1">Buy</a>
+                        <a href="{% url 'astromall:add_to_cart' product.id %}"
+                            class="btn btn-sm btn-outline-danger rounded-pill"><i class="bi bi-cart-plus"></i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <p class="text-center">No products found.</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

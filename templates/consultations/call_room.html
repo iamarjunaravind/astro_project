@@ -1,0 +1,114 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block extra_css %}
+<style>
+    #jitsi-container {
+        height: 70vh;
+        width: 100%;
+        background: #000;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    }
+
+    .call-controls {
+        background: white;
+        padding: 20px;
+        border-radius: 12px;
+        margin-top: 20px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h3 class="fw-bold mb-0">{% trans "Consultation Call" %}</h3>
+                    <p class="text-muted mb-0">
+                        {% if user.astrologer_profile %}
+                        {% trans "Calling" %}: {{ booking.user.get_full_name|default:booking.user.username }}
+                        {% if booking.user.profile and booking.user.profile.phone_number %}
+                        | <i class="bi bi-telephone-fill"></i> <a href="tel:{{ booking.user.profile.phone_number }}"
+                            class="text-decoration-none">{{ booking.user.profile.phone_number }}</a>
+                        {% endif %}
+                        {% else %}
+                        {% trans "Calling" %}: {{ booking.astrologer.user.username }}
+                        {% endif %}
+                    </p>
+                </div>
+                <a href="{% if user.astrologer_profile %}{% url 'consultations:astrologer_dashboard' %}{% else %}{% url 'consultations:my_bookings' %}{% endif %}"
+                    class="btn btn-outline-danger rounded-pill">
+                    <i class="bi bi-x-lg me-1"></i> {% trans "Exit Call" %}
+                </a>
+            </div>
+
+            <div id="jitsi-container"></div>
+
+            <div class="call-controls text-center">
+                <p class="small text-muted mb-3">
+                    <i class="bi bi-info-circle me-1"></i>
+                    {% trans "Please allow camera and microphone access when prompted by your browser." %}
+                </p>
+                <div class="d-flex justify-content-center gap-3">
+                    <button id="end-call-btn" class="btn btn-danger btn-lg rounded-circle"
+                        style="width: 60px; height: 60px;">
+                        <i class="bi bi-telephone-x-fill"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://meet.jit.si/external_api.js"></script>
+<script>
+    const domain = 'meet.jit.si';
+    const options = {
+        roomName: '{{ room_name }}',
+        width: '100%',
+        height: '100%',
+        parentNode: document.querySelector('#jitsi-container'),
+        userInfo: {
+            displayName: '{{ user_display_name }}'
+        },
+        interfaceConfigOverwrite: {
+            TOOLBAR_BUTTONS: [
+                'microphone', 'camera', 'closedcaptions', 'desktop', 'fullscreen',
+                'fodeviceselection', 'hangup', 'profile', 'chat', 'recording',
+                'livestreaming', 'etherpad', 'sharedvideo', 'settings', 'raisehand',
+                'videoquality', 'filmstrip', 'invite', 'feedback', 'stats', 'shortcuts',
+                'tileview', 'videobackgroundblur', 'download', 'help', 'mute-everyone',
+                'security'
+            ],
+            SETTINGS_SECTIONS: ['devices', 'language', 'moderator', 'profile', 'calendar'],
+            SHOW_CHROME_EXTENSION_BANNER: false
+        },
+        configOverwrite: {
+            startWithAudioMuted: false,
+            disableDeepLinking: true,
+            enableWelcomePage: false,
+            prejoinPageEnabled: false
+        }
+    };
+
+    const api = new JitsiMeetExternalAPI(domain, options);
+
+    // End call button
+    document.getElementById('end-call-btn').addEventListener('click', () => {
+        api.executeCommand('hangup');
+        window.location.href = "{% if user.astrologer_profile %}{% url 'consultations:astrologer_dashboard' %}{% else %}{% url 'consultations:my_bookings' %}{% endif %}";
+    });
+
+    // Handle Jitsi hangup event
+    api.addEventListeners({
+        readyToClose: function () {
+            window.location.href = "{% if user.astrologer_profile %}{% url 'consultations:astrologer_dashboard' %}{% else %}{% url 'consultations:my_bookings' %}{% endif %}";
+        }
+    });
+</script>
+{% endblock %}

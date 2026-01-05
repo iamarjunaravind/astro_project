@@ -1,0 +1,164 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+    .auth-page-wrapper {
+        min-height: 85vh;
+        display: flex;
+        align-items: flex-start;
+        justify-content: center;
+        background-color: #f8f9fa;
+        padding-top: 40px;
+        padding-bottom: 100px;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .premium-card {
+        background: #ffffff;
+        border: 1px solid #e0e0e0;
+        border-radius: 12px;
+        padding: 2.5rem 2rem;
+        width: 100%;
+        max-width: 400px;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+        margin-top: 40px;
+        margin-bottom: 60px;
+    }
+
+    /* Mobile Responsive Fixes */
+    @media (max-width: 768px) {
+        .auth-page-wrapper {
+            min-height: auto;
+            padding-top: 0;
+            padding-bottom: 0;
+            display: block;
+            /* Stack naturally */
+        }
+
+        .premium-card {
+            margin-top: 0;
+            margin-bottom: 0;
+            border-radius: 0;
+            /* Full width feel */
+            border-left: none;
+            border-right: none;
+            max-width: 100%;
+            padding: 2rem 1.5rem;
+            box-shadow: none;
+        }
+    }
+
+    .auth-header {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+
+    .auth-title {
+        color: #2b2b2b;
+        font-size: 1.8rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+    }
+
+    .auth-subtitle {
+        color: #666;
+        font-size: 0.95rem;
+    }
+
+    .form-group {
+        margin-bottom: 1.2rem;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 0.5rem;
+        color: #444;
+        font-size: 0.9rem;
+        font-weight: 600;
+    }
+
+    .custom-input {
+        width: 100%;
+        padding: 10px 14px;
+        background: #fff;
+        border: 1px solid #ced4da;
+        border-radius: 6px;
+        color: #333;
+        font-size: 1rem;
+        transition: border-color 0.2s;
+    }
+
+    .custom-input:focus {
+        outline: none;
+        border-color: rgb(171, 13, 13);
+        box-shadow: 0 0 0 3px rgba(171, 13, 13, 0.1);
+    }
+
+    .submit-btn {
+        width: 100%;
+        padding: 12px;
+        background: rgb(171, 13, 13);
+        border: none;
+        border-radius: 6px;
+        color: white;
+        font-size: 1.05rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.3s;
+        margin-top: 1rem;
+    }
+
+    .submit-btn:hover {
+        background: rgb(140, 10, 10);
+    }
+
+    .auth-footer {
+        text-align: center;
+        margin-top: 1.5rem;
+        color: #666;
+        font-size: 0.9rem;
+    }
+
+    .auth-footer a {
+        color: rgb(171, 13, 13);
+        text-decoration: none;
+        font-weight: 600;
+    }
+
+    .auth-footer a:hover {
+        text-decoration: underline;
+    }
+</style>
+
+<div class="auth-page-wrapper">
+    <div class="premium-card">
+        <div class="auth-header">
+            <h1 class="auth-title">Login to continue</h1>
+            <!-- <p class="auth-subtitle">Sign in to continue your journey</p> -->
+        </div>
+
+        <form method="post">
+            {% csrf_token %}
+
+            {% for field in form %}
+            <div class="form-group">
+                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                <input type="{{ field.field.widget.input_type }}" name="{{ field.name }}" id="{{ field.id_for_label }}"
+                    class="custom-input" value="{{ field.value|default:'' }}" {{ field.field.required|yesno:'required,' }}>
+                {% if field.errors %}
+                <div class="text-danger small mt-1">
+                    {{ field.errors.0 }}
+                </div>
+                {% endif %}
+            </div>
+            {% endfor %}
+
+            <button type="submit" class="submit-btn">Login</button>
+        </form>
+
+        <div class="auth-footer">
+            Don't have an account? <a href="{% url 'accounts:register' %}">Create Account</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

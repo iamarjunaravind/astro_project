@@ -1,0 +1,196 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-01-05 12:41+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: ml\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "Astrology Platform"
+msgstr "ജ്യോതിഷ പ്ലാറ്റ്‌ഫോം"
+
+msgid "Home"
+msgstr "ഹോം"
+
+msgid "Chat with Astrologer"
+msgstr "ജ്യോതിഷിയുമായി സംസാരിക്കുക"
+
+msgid "Talk with Astrologer"
+msgstr "ജ്യോതിഷിയുമായി സംസാരിക്കുക"
+
+msgid "Astromall"
+msgstr "അസ്ട്രോമാൾ"
+
+msgid "Blog"
+msgstr "ബ്ലോഗ്"
+
+msgid "Kundali"
+msgstr "കുണ്ഡലി"
+
+msgid "Horoscopes"
+msgstr "ജാതകം"
+
+msgid "Today"
+msgstr "ഇന്ന്"
+
+msgid "Tomorrow"
+msgstr "നാളെ"
+
+msgid "Yesterday"
+msgstr "ഇന്നലെ"
+
+msgid "Weekly"
+msgstr "വാരഫലം"
+
+msgid "Monthly"
+msgstr "മാസഫലം"
+
+msgid "Yearly"
+msgstr "വർഷഫലം"
+
+msgid "Profile"
+msgstr "പ്രൊഫൈൽ"
+
+msgid "Logout"
+msgstr "പുറത്തുകടക്കുക"
+
+msgid "Login"
+msgstr "പ്രവേശിക്കുക"
+
+msgid "Menu"
+msgstr "മെനു"
+
+msgid "Astrology"
+msgstr "ജ്യോതിഷം"
+
+msgid "Kundli"
+msgstr "കുണ്ഡലി"
+
+msgid "Horoscope"
+msgstr "ജാതകം"
+
+msgid "Compatibility"
+msgstr "അനുയോജ്യത"
+
+msgid "Shop"
+msgstr "ഷോപ്പ്"
+
+msgid "Gemstones"
+msgstr "രത്നങ്ങൾ"
+
+msgid "Rudraksha"
+msgstr "രുദ്രാക്ഷം"
+
+msgid "Contact"
+msgstr "ബന്ധപ്പെടുക"
+
+msgid "24×7 Chat"
+msgstr "24×7 ചാറ്റ്"
+
+msgid "Email Support"
+msgstr "ഇമെയിൽ പിന്തുണ"
+
+msgid "Secure"
+msgstr "സുരക്ഷിതം"
+
+msgid "Verified Astrologers"
+msgstr "പരിശോധിച്ച ജ്യോത്സ്യന്മാർ"
+
+msgid "Secure Payments"
+msgstr "സുരക്ഷിത പേയ്‌മെന്റുകൾ"
+
+msgid "Astrology Platform. All Rights Reserved"
+msgstr "ജ്യോതിഷ പ്ലാറ്റ്‌ഫോം. എല്ലാ അവകാശങ്ങളും നിക്ഷിപ്തം"
+
+msgid "Claim FREE gift"
+msgstr "സൗജന്യ സമ്മാനം നേടുക"
+
+msgid "200+ Celebs recommend"
+msgstr "200+ പ്രശസ്ത വ്യക്തികൾ ശുപാർശ ചെയ്യുന്നു"
+
+msgid "Chat With Astrologer"
+msgstr "ജ്യോതിഷിയുമായി സംസാരിക്കുക"
+
+msgid "Talk With Astrologer"
+msgstr "ജ്യോതിഷിയുമായി സംസാരിക്കുക"
+
+msgid "Chat Now"
+msgstr "ഇപ്പോൾ സംസാരിക്കുക"
+
+msgid "Talk Now"
+msgstr "ഇപ്പോൾ സംസാരിക്കുക"
+
+msgid "Astrologer"
+msgstr "ജ്യോതിഷി"
+
+msgid "Talk"
+msgstr "സംസാരിക്കുക"
+
+msgid "Talk to Astrologer"
+msgstr "ജ്യോത്സ്യനോട് സംസാരിക്കുക"
+
+msgid "Chat"
+msgstr "ചാറ്റ്"
+
+msgid "Store"
+msgstr "സ്റ്റോർ"
+
+msgid "Pujya Store"
+msgstr "പൂജ്യ സ്റ്റോർ"
+
+msgid "Puja"
+msgstr "പൂജ"
+
+msgid "Book a Pooja"
+msgstr "ഒരു പൂജ ബുക്ക് ചെയ്യുക"
+
+msgid "46,702+"
+msgstr "46,702+"
+
+msgid "Total Astrologers"
+msgstr "ആകെ ജ്യോത്സ്യന്മാർ"
+
+msgid "1326M"
+msgstr "1326M"
+
+msgid "Minutes"
+msgstr "മിനിറ്റുകൾ"
+
+msgid "109.4M"
+msgstr "109.4M"
+
+msgid "Customers"
+msgstr "ഉപഭോക്താക്കൾ"
+
+msgid "OUR ASTROLOGY SERVICES"
+msgstr "ഞങ്ങളുടെ ജ്യോതിഷ സേവനങ്ങൾ"
+
+msgid "min"
+msgstr "മിനിറ്റ്"
+
+msgid "Consult"
+msgstr "കൺസൾട്ട് ചെയ്യുക"
+
+msgid "No astrologers found."
+msgstr "ജ്യോത്സ്യന്മാരെ കണ്ടെത്തിയില്ല."
+
+msgid "TOP SELLING PRODUCTS"
+msgstr "മികച്ച വിൽപ്പനയുള്ള ഉൽപ്പന്നങ്ങൾ"
+
+msgid "Buy Now"
+msgstr "ഇപ്പോൾ വാങ്ങുക"
+
+msgid "No products found."
+msgstr "ഉൽപ്പന്നങ്ങളൊന്നും കണ്ടെത്തിയില്ല."
+
+msgid "View All Products"
+msgstr "എല്ലാ ഉൽപ്പന്നങ്ങളും കാണുക"
+
+msgid "Blogs"
+msgstr "ബ്ലോഗുകൾ"

@@ -1,0 +1,109 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block content %}
+<div class="mainContainer">
+    <section class="hero">
+        <div>
+            <p>{% trans "200+ Celebs recommend" %}</p>
+            <h1>{% trans "Talk with Astrologer" %}</h1>
+            <a href="{% url 'astrologers:astrologer_list' %}"><button>{% trans "Talk Now" %}</button></a>
+        </div>
+        <!-- Hero Image -->
+        <img class="mainImage" src="{% static 'img/hero.png' %}" alt="{% trans 'Astrologer' %}">
+    </section>
+
+    <section class="services row text-center">
+        <div class="service col">
+            <a href="{% url 'astrologers:astrologer_list' %}">
+                <img src="{% static 'img/icon_talk.png' %}" alt="{% trans 'Talk' %}" style="width: 50px; height: 50px;">
+                <p>{% trans "Talk to Astrologer" %}</p>
+            </a>
+        </div>
+        <div class="service col">
+            <a href="{% url 'astrologers:astrologer_list' %}">
+                <img src="{% static 'img/icon_chat.png' %}" alt="{% trans 'Chat' %}" style="width: 50px; height: 50px;">
+                <p>{% trans "Chat with Astrologer" %}</p>
+            </a>
+        </div>
+        <div class="service col">
+            <a href="{% url 'astromall:product_list' %}">
+                <img src="{% static 'img/icon_store.png' %}" alt="{% trans 'Store' %}"
+                    style="width: 50px; height: 50px;">
+                <p>{% trans "Pujya Store" %}</p>
+            </a>
+        </div>
+        <div class="service col">
+            <a href="#">
+                <img src="{% static 'img/icon_pooja.png' %}" alt="{% trans 'Puja' %}"
+                    style="width: 50px; height: 50px;">
+                <p>{% trans "Book a Pooja" %}</p>
+            </a>
+        </div>
+    </section>
+</div>
+
+<section class="stats">
+    <div>{% trans "46,702+" %}<br>{% trans "Total Astrologers" %}</div>
+    <div>{% trans "1326M" %}<br>{% trans "Minutes" %}</div>
+    <div>{% trans "109.4M" %}<br>{% trans "Customers" %}</div>
+</section>
+
+<!-- Featured Astrologers Section -->
+<section class="KKOMER section container">
+    <h2>{% trans "OUR ASTROLOGY SERVICES" %}</h2>
+
+    <div class="row g-4">
+        {% for profile in astrologers %}
+        <div class="col-lg-3 col-md-4 col-sm-6 col-6">
+            <div class="service-card">
+                <!-- Avatar Placeholder -->
+                <div style="margin: 10px auto;">
+                    <img src="{% static 'img/default_avatar.png' %}" alt="Avatar"
+                        style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover;">
+                </div>
+                <h5 style="font-size: 16px; margin-bottom: 5px;">{{ profile.user.username }}</h5>
+                <p style="font-size: 13px; color: #777;">Starts at ₹{{ profile.chat_price_per_minute }}/{% trans "min" %}</p>
+                <div style="margin-top: 10px;">
+                    <a href="{% url 'astrologers:astrologer_detail' profile.pk %}" class="btn btn-outline-danger btn-sm"
+                        style="border-radius: 20px;">{% trans "Consult" %}</a>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <p class="text-center">{% trans "No astrologers found." %}</p>
+        {% endfor %}
+    </div>
+</section>
+
+<!-- Astromall Section -->
+<section class="section">
+    <h1>{% trans "Pujya Store" %}</h1>
+    <h2>{% trans "TOP SELLING PRODUCTS" %}</h2>
+    <div class="cards">
+        {% for product in products %}
+        <div class="card">
+            {% if product.image %}
+            <img src="{{ product.image.url }}" alt="{{ product.name }}">
+            {% else %}
+            <img src="{% static 'img/default_product.png' %}" alt="{{ product.name }}">
+            {% endif %}
+            <p>{{ product.name }} <br> <span class="text-danger">₹{{ product.price }}</span></p>
+            <div style="padding-bottom: 15px;">
+                <a href="{% url 'astromall:product_detail' product.pk %}" class="btn btn-dark btn-sm"
+                    style="border-radius: 20px;">{% trans "Buy Now" %}</a>
+            </div>
+        </div>
+        {% empty %}
+        <p>{% trans "No products found." %}</p>
+        {% endfor %}
+    </div>
+
+    <div class="text-center mt-5">
+        <a href="{% url 'astromall:product_list' %}" class="btn btn-outline-dark"
+            style="border-radius: 20px; padding: 10px 30px;">{% trans "View All Products" %}</a>
+    </div>
+</section>
+
+{% endblock %}

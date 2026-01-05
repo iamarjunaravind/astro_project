@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow-sm border-0">
+                <div class="card-body p-4">
+                    <h2 class="text-center mb-4">{% trans "Book a Consultation" %}</h2>
+                    <div class="text-center mb-4">
+                        <h4>{{ astrologer.user.username }}</h4>
+                        <p class="text-muted">{{ astrologer.experience_years }} {% trans "years experience" %}</p>
+                        <div class="alert alert-info py-2">
+                            <span class="fw-bold">{% trans "Service" %}:</span> {% trans "Scheduled Voice Call" %} |
+                            <span class="fw-bold">{% trans "Price" %}:</span> ₹{{ price }}/min
+                        </div>
+                    </div>
+
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label class="form-label">{% trans "Select Date & Time" %}</label>
+                            {{ form.scheduled_at }}
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">{% trans "Notes (Optional)" %}</label>
+                            {{ form.notes }}
+                        </div>
+                        <div class="d-grid mt-4">
+                            <button type="submit" class="btn btn-danger btn-lg rounded-pill">{% trans "Confirm Booking" %}</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="text-center mt-3">
+                <a href="{% url 'astrologers:astrologer_list' %}" class="text-decoration-none text-muted">← {% trans "Back to List" %}</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,186 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block content %}
+<div class="container section">
+    <div class="card h-100 border-0 shadow-sm" style="max-width: 800px; margin: 0 auto; height: 80vh !important;">
+        {% if not session.is_active %}
+        <!-- Chat Ended Message -->
+        <div class="card-body d-flex flex-column align-items-center justify-content-center">
+            <div class="text-center">
+                <i class="bi bi-chat-x-fill text-muted" style="font-size: 80px;"></i>
+                <h3 class="mt-4 mb-2">{% trans "Chat Ended" %}</h3>
+                <p class="text-muted">{% trans "This consultation has been completed." %}</p>
+                <a href="{% if user == session.astrologer %}{% url 'consultations:astrologer_dashboard' %}{% else %}{% url 'consultations:my_bookings' %}{% endif %}"
+                    class="btn btn-primary rounded-pill mt-3">
+                    {% trans "Return to Dashboard" %}
+                </a>
+            </div>
+        </div>
+        {% else %}
+        <!-- Chat Header -->
+        <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
+            <div class="d-flex align-items-center gap-3">
+                <div
+                    style="width: 40px; height: 40px; background: #eee; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; color: #555;">
+                    {% if user == session.customer %}
+                    {{ session.astrologer.username|make_list|first|upper }}
+                    {% else %}
+                    {{ session.customer.username|make_list|first|upper }}
+                    {% endif %}
+                </div>
+                <div>
+                    <h5 class="mb-0">
+                        {% if user == session.customer %}
+                        {{ session.astrologer.username }}
+                        {% else %}
+                        {{ session.customer.get_full_name|default:session.customer.username }}
+                        <small class="text-muted d-block" style="font-size: 12px;">
+                            {{ session.customer.email }}
+                            {% if session.customer.profile.phone_number %}
+                            href="tel:{{ session.customer.profile.phone_number }}" class="text-decoration-none">{{ session.customer.profile.phone_number }}</a>
+                            {% endif %}
+                        </small>
+                        {% endif %}
+                    </h5>
+                    <small class="text-success">● Online</small>
+                </div>
+            </div>
+            {% if user == session.astrologer %}
+            <a href="{% url 'consultations:end_chat' session.id %}" class="btn btn-danger btn-sm rounded-pill"
+                onclick="return confirm('Are you sure you want to end this chat?');"><i
+                    class="bi bi-x-circle-fill me-1"></i> {% trans "Quit & Mark Completed" %}</a>
+            {% else %}
+            <a href="{% url 'consultations:my_bookings' %}" class="btn btn-outline-secondary btn-sm rounded-pill">{% trans "Back" %}</a>
+            {% endif %}
+        </div>
+
+        <!-- Chat Messages -->
+        <div id="chat-messages" class="card-body overflow-auto bg-light"
+            style="display: flex; flex-direction: column; gap: 1rem; scroll-behavior: smooth;">
+            {% for message in messages %}
+            <div
+                class="d-flex {% if message.sender == user %}justify-content-end{% else %}justify-content-start{% endif %}">
+                <div
+                    style="max-width: 75%; padding: 10px 15px; border-radius: 15px; {% if message.sender == user %}background: #bd0000; color: white; border-bottom-right-radius: 2px;{% else %}background: white; border: 1px solid #ddd; border-bottom-left-radius: 2px;{% endif %}">
+                    <p class="mb-1">{{ message.content }}</p>
+                    <small style="font-size: 11px; opacity: 0.8; display: block; text-align: right;">{{ message.timestamp|date:"H:i" }}</small>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Message Input -->
+        <div class="card-footer bg-white border-top p-3">
+            <form method="post" class="d-flex gap-2">
+                {% csrf_token %}
+                <input type="text" name="content" class="form-control rounded-pill" placeholder="Type your message..."
+                    autocomplete="off" required>
+                <button type="submit" class="btn btn-danger rounded-circle p-2" style="width: 45px; height: 45px;">
+                    <i class="bi bi-send-fill"></i>
+                </button>
+            </form>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+    const chatContainer = document.getElementById('chat-messages');
+    let lastId = {% if messages %}{ { messages.last.id } } {% else %} 0{% endif %};
+    const currentUserId = {{ user.id }};
+
+    function scrollToBottom() {
+        setTimeout(() => {
+            if (chatContainer) {
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+            }
+        }, 100);
+    }
+
+    // Scroll to bottom on load
+    window.onload = scrollToBottom;
+    setTimeout(scrollToBottom, 500); // Also try after 500ms
+
+    // AJAX Send
+    const chatForm = document.querySelector('form');
+    if (chatForm) {
+        chatForm.onsubmit = function (e) {
+            e.preventDefault();
+            const input = this.querySelector('input[name="content"]');
+            const content = input.value.trim();
+            if (!content) return;
+
+            const formData = new FormData();
+            formData.append('content', content);
+            formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
+
+            fetch("{% url 'consultations:send_message_ajax' session.id %}", {
+                method: 'POST',
+                body: formData
+            })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.id) {
+                        input.value = '';
+                        appendMessage(data);
+                        lastId = data.id;
+                    }
+                })
+                .catch(err => console.error("Send error:", err));
+        };
+    }
+
+    function appendMessage(msg) {
+        const isMe = msg.sender_id == currentUserId;
+        const msgDiv = document.createElement('div');
+        msgDiv.className = `d-flex ${isMe ? 'justify-content-end' : 'justify-content-start'}`;
+        msgDiv.innerHTML = `
+            <div style="max-width: 75%; padding: 10px 15px; border-radius: 15px; ${isMe ? 'background: #bd0000; color: white; border-bottom-right-radius: 2px;' : 'background: white; border: 1px solid #ddd; border-bottom-left-radius: 2px;'}">
+                <p class="mb-1">${msg.content}</p>
+                <small style="font-size: 11px; opacity: 0.8; display: block; text-align: right;">${msg.timestamp}</small>
+            </div>
+        `;
+        chatContainer.appendChild(msgDiv);
+        scrollToBottom();
+    }
+
+    // AJAX Polling
+    function pollMessages() {
+        let url = "{% url 'consultations:get_messages' session.id %}";
+        if (lastId > 0) {
+            url += `?last_id=${lastId}`;
+        }
+
+        fetch(url)
+            .then(res => res.json())
+            .then(data => {
+                if (data.messages && data.messages.length > 0) {
+                    data.messages.forEach(msg => {
+                        if (msg.sender_id != currentUserId) {
+                            // Check if message already exists by ID to avoid duplicates
+                            if (!document.querySelector(`[data-msg-id="${msg.id}"]`)) {
+                                appendMessage(msg);
+                                // mark the message div with the id
+                                chatContainer.lastElementChild.setAttribute('data-msg-id', msg.id);
+                            }
+                        }
+                        lastId = Math.max(lastId, msg.id);
+                    });
+                }
+            })
+            .catch(err => console.error("Polling error:", err))
+            .finally(() => {
+                setTimeout(pollMessages, 3000);
+            });
+    }
+
+    // Initial message count for duplicate check
+    document.querySelectorAll('#chat-messages > div').forEach((div, index) => {
+        // We don't have IDs on load yet, but we can skip them since they are rendered by Django
+    });
+
+    // Start polling
+    setTimeout(pollMessages, 3000);
+</script>
+{% endblock %}
