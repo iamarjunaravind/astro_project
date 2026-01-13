@@ -44,9 +44,30 @@
     <h1 class="text-center mb-4">Talk to Astrologers</h1>
 
     <!-- Filter Section -->
-    <form method="GET" class="d-flex gap-2 mb-4 justify-content-center px-2">
+    <!-- Desktop Search -->
+    <form method="GET" class="d-none d-sm-flex gap-2 mb-4 justify-content-center px-2">
         <input type="text" name="q" class="form-control w-auto" placeholder="Search..." value="{{ request.GET.q }}">
         <button type="submit" class="btn btn-dark btn-sm">Search</button>
+    </form>
+
+    <!-- Mobile Search & Filter -->
+    <form method="GET" class="d-block d-sm-none mb-4 px-2">
+        <div class="row g-2">
+            <div class="col-6">
+                <select name="skill" class="form-select form-select-sm" onchange="this.form.submit()">
+                    <option value="">All Categories</option>
+                    {% for skill in skills %}
+                    <option value="{{ skill.name }}" {% if selected_skill == skill.name %}selected{% endif %}>{{ skill.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-6">
+                <div class="input-group input-group-sm">
+                    <input type="text" name="q" class="form-control" placeholder="Search..." value="{{ request.GET.q }}">
+                    <button type="submit" class="btn btn-dark"><i class="bi bi-search"></i></button>
+                </div>
+            </div>
+        </div>
     </form>
 
     <div class="row g-4 px-1">

@@ -4,41 +4,41 @@
 
 {% block content %}
 <div class="mainContainer">
-    <section class="hero">
+    <section class="hero simple-fade">
         <div>
             <p>{% trans "200+ Celebs recommend" %}</p>
             <h1>{% trans "Talk with Astrologer" %}</h1>
-            <a href="{% url 'astrologers:astrologer_list' %}"><button>{% trans "Talk Now" %}</button></a>
+            <a href="{% url 'astrologers:astrologer_list' %}" class="hero-btn">{% trans "Talk Now" %}</a>
         </div>
         <!-- Hero Image -->
         <img class="mainImage" src="{% static 'img/hero.png' %}" alt="{% trans 'Astrologer' %}">
     </section>
 
     <section class="services row text-center">
-        <div class="service col">
+        <div class="service col simple-fade">
             <a href="{% url 'astrologers:astrologer_list' %}">
                 <img src="{% static 'img/icon_talk.png' %}" alt="{% trans 'Talk' %}" style="width: 50px; height: 50px;">
-                <p>{% trans "Talk to Astrologer" %}</p>
+                <p>{% trans "Talk to" %} <br> {% trans "Astrologer" %}</p>
             </a>
         </div>
-        <div class="service col">
+        <div class="service col simple-fade">
             <a href="{% url 'astrologers:astrologer_list' %}">
                 <img src="{% static 'img/icon_chat.png' %}" alt="{% trans 'Chat' %}" style="width: 50px; height: 50px;">
-                <p>{% trans "Chat with Astrologer" %}</p>
+                <p>{% trans "Chat with" %} <br> {% trans "Astrologer" %}</p>
             </a>
         </div>
-        <div class="service col">
+        <div class="service col simple-fade">
             <a href="{% url 'astromall:product_list' %}">
                 <img src="{% static 'img/icon_store.png' %}" alt="{% trans 'Store' %}"
                     style="width: 50px; height: 50px;">
-                <p>{% trans "Pujya Store" %}</p>
+                <p>{% trans "Pujya" %} <br> {% trans "Store" %}</p>
             </a>
         </div>
-        <div class="service col">
-            <a href="#">
+        <div class="service col simple-fade">
+            <a href="{% url 'astromall:pooja_list' %}">
                 <img src="{% static 'img/icon_pooja.png' %}" alt="{% trans 'Puja' %}"
                     style="width: 50px; height: 50px;">
-                <p>{% trans "Book a Pooja" %}</p>
+                <p>{% trans "Book a" %} <br> {% trans "Pooja" %}</p>
             </a>
         </div>
     </section>
@@ -64,7 +64,8 @@
                         style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover;">
                 </div>
                 <h5 style="font-size: 16px; margin-bottom: 5px;">{{ profile.user.username }}</h5>
-                <p style="font-size: 13px; color: #777;">Starts at ₹{{ profile.chat_price_per_minute }}/{% trans "min" %}</p>
+                <p style="font-size: 13px; color: #777;">Starts at ₹{{ profile.chat_price_per_minute }}/{% trans "min"
+                    %}</p>
                 <div style="margin-top: 10px;">
                     <a href="{% url 'astrologers:astrologer_detail' profile.pk %}" class="btn btn-outline-danger btn-sm"
                         style="border-radius: 20px;">{% trans "Consult" %}</a>
@@ -81,26 +82,59 @@
 <section class="section">
     <h1>{% trans "Pujya Store" %}</h1>
     <h2>{% trans "TOP SELLING PRODUCTS" %}</h2>
-    <div class="cards">
-        {% for product in products %}
-        <div class="card">
-            {% if product.image %}
-            <img src="{{ product.image.url }}" alt="{{ product.name }}">
-            {% else %}
-            <img src="{% static 'img/default_product.png' %}" alt="{{ product.name }}">
-            {% endif %}
-            <p>{{ product.name }} <br> <span class="text-danger">₹{{ product.price }}</span></p>
-            <div style="padding-bottom: 15px;">
-                <a href="{% url 'astromall:product_detail' product.pk %}" class="btn btn-dark btn-sm"
-                    style="border-radius: 20px;">{% trans "Buy Now" %}</a>
+    <div class="container pb-2">
+        {% for category in categories %}
+        {% if category.products.exists %}
+        <div class="mb-3">
+            <h3 class="fw-bold mb-3" style="color: #9F1239;">{{ category.name }}</h3>
+            <div class="scrolling-wrapper">
+                {% for product in category.products.all %}
+                <div class="card card-scroll-item h-100 border-0 shadow-sm" style="border: 1px solid #eaeaea;">
+                    <a href="{% url 'astromall:product_detail' product.pk %}" class="text-decoration-none text-dark">
+                        <div style="position: relative; border-radius: 0; overflow: hidden; background: #f8f9fa;">
+                             <!-- Image Aspect Ratio 1:1 -->
+                            <div style="padding-top: 100%;"></div>
+                            {% if product.image %}
+                            <img src="{{ product.image.url }}" alt="{{ product.name }}" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover;">
+                            {% else %}
+                            <img src="{% static 'img/default_product.png' %}" alt="{{ product.name }}" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover;">
+                            {% endif %}
+                            <!-- Badge -->
+                             <span class="position-absolute top-0 end-0 badge bg-danger m-2 rounded-undefined" style="font-size: 0.7rem;">-10%</span>
+                        </div>
+                        
+                        <div class="card-body p-2 d-flex flex-column">
+                            <h6 class="card-title fw-bold text-truncate mb-1" style="font-size: 0.95rem; color: var(--kumkum-red);">{{ product.name }}</h6>
+                            
+                            <!-- Mock Rating -->
+                            <div class="mb-2 text-warning small">
+                                <i class="bi bi-star-fill"></i>
+                                <i class="bi bi-star-fill"></i>
+                                <i class="bi bi-star-fill"></i>
+                                <i class="bi bi-star-fill"></i>
+                                <i class="bi bi-star-half"></i>
+                                <span class="text-muted ms-1" style="font-size: 0.75rem;">(4.5)</span>
+                            </div>
+
+                            <div class="mt-auto">
+                                <p class="card-text m-0 text-nowrap">
+                                    <span class="text-muted text-decoration-line-through small me-2" style="font-size: 0.8rem;">₹{{ product.price|add:"100" }}</span>
+                                    <span class="text-danger fw-bold">₹{{ product.price }}</span>
+                                </p>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                {% endfor %}
             </div>
         </div>
+        {% endif %}
         {% empty %}
-        <p>{% trans "No products found." %}</p>
+        <p class="text-center">{% trans "No products found." %}</p>
         {% endfor %}
     </div>
 
-    <div class="text-center mt-5">
+    <div class="text-center mt-3">
         <a href="{% url 'astromall:product_list' %}" class="btn btn-outline-dark"
             style="border-radius: 20px; padding: 10px 30px;">{% trans "View All Products" %}</a>
     </div>

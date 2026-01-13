@@ -22,12 +22,44 @@
                     <p class="text-muted" style="line-height: 1.8;">{{ product.description }}</p>
                 </div>
 
+                {% if product.category.name == 'Pooja' %}
+                <div class="card bg-light border-0 mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title text-danger mb-3">Devotee Details</h5>
+                        <form action="{% url 'astromall:add_to_cart' product.id %}" method="POST">
+                            {% csrf_token %}
+                            <div class="mb-3">
+                                <label for="devotee_name" class="form-label">Name of Devotee</label>
+                                <input type="text" class="form-control" id="devotee_name" name="devotee_name" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="contact_number" class="form-label">Contact Number</label>
+                                <input type="tel" class="form-control" id="contact_number" name="contact_number"
+                                    required>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="dob" class="form-label">Date of Birth</label>
+                                    <input type="date" class="form-control" id="dob" name="dob" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="birth_time" class="form-label">Time of Birth / Pooja</label>
+                                    <input type="time" class="form-control" id="birth_time" name="birth_time" required>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-danger w-100 py-3 rounded-pill fw-bold">Book Pooja
+                                Now</button>
+                        </form>
+                    </div>
+                </div>
+                {% else %}
                 <div class="d-flex gap-3">
                     <a href="{% url 'astromall:buy_now' product.id %}"
                         class="btn btn-danger flex-grow-1 py-3 rounded-pill fw-bold">Buy Now</a>
                     <a href="{% url 'astromall:add_to_cart' product.id %}"
                         class="btn btn-outline-danger flex-grow-1 py-3 rounded-pill fw-bold">Add to Cart</a>
                 </div>
+                {% endif %}
             </div>
         </div>
     </div>

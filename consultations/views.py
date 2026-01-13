@@ -71,7 +71,7 @@ def start_chat_from_booking(request, booking_id):
             if request.user.profile.wallet_balance < required_balance:
                 # In a real app, redirect to recharge. For now, show error/stay on bookings
                 # We can add a message framework logic here later
-                print(f"Insufficient balance: {request.user.profile.wallet_balance} < {required_balance}")
+                # print(f"Insufficient balance: {request.user.profile.wallet_balance} < {required_balance}")
                 return redirect('consultations:my_bookings')
         else:
             return redirect('home')
@@ -97,7 +97,7 @@ def start_call_booking(request, booking_id):
                 min_minutes = 5
                 required_balance = booking.astrologer.call_price_per_minute * min_minutes
                 if request.user.profile.wallet_balance < required_balance:
-                     print(f"Insufficient balance for call")
+                     # print(f"Insufficient balance for call")
                      return redirect('consultations:my_bookings')
             else:
                 return redirect('home')
@@ -201,72 +201,7 @@ def submit_review(request, booking_id):
         
     return redirect('consultations:my_bookings')
 
-@login_required
-def end_chat(request, session_id):
-    from django.utils import timezone
-    session = get_object_or_404(ChatSession, id=session_id)
-    
-    # Only astrologer can end the chat
-    if session.astrologer != request.user:
-        return redirect('home')
-    
-    # Mark session as inactive and set end time
-    session.is_active = False
-    session.end_time = timezone.now()
-    session.save()
-    
-    # Calculate duration and deduct wallet
-    try:
-        duration_minutes = (session.end_time - session.start_time).total_seconds() / 60
-        # Ensure at least 1 minute is charged if connected
-        duration_minutes = max(1, duration_minutes)
-        
-        # Get price rate
-        astrologer_profile = session.astrologer.astrologer_profile
-        rate = astrologer_profile.chat_price_per_minute
-        cost = getattr(rate, 'real', rate) * getattr(duration_minutes, 'real', duration_minutes)
-        from decimal import Decimal
-        cost = Decimal(cost)
-        
-        # Deduct from customer
-        session.customer.profile.deduct_wallet(cost, description=f"Chat Consultation with {session.astrologer.username}")
-        
-        # Credit to astrologer
-        session.astrologer.profile.credit_wallet(cost, description=f"Chat Consultation with {session.customer.username}")
-        
-        print(f"Deducted {cost} for {duration_minutes:.2f} mins")
-    except Exception as e:
-        print(f"Error in wallet transaction: {e}")
-        import traceback
-        traceback.print_exc()
-    
-    # Delete all messages in this session
-    ChatMessage.objects.filter(session=session).delete()
-    
-    # Find and complete the associated booking
-    try:
-        # Try to find the most recent pending or approved chat booking
-        booking = Booking.objects.filter(
-            user=session.customer,
-            astrologer__user=session.astrologer,
-            consultation_type='chat'
-        ).filter(
-            status__in=['pending', 'approved']
-        ).order_by('-scheduled_at').first()
-        
-        if booking:
-            booking.status = 'completed'
-            booking.save()
-            print(f"Booking {booking.id} marked as completed (was {booking.status})")
-        else:
-            print(f"No matching booking found for session {session.id}")
-            print(f"Customer: {session.customer}, Astrologer: {session.astrologer}")
-    except Exception as e:
-        print(f"Error completing booking: {e}")
-        import traceback
-        traceback.print_exc()
-    
-    return redirect('consultations:astrologer_dashboard')
+
 
 @login_required
 def complete_booking(request, booking_id):
@@ -364,6 +299,13 @@ def send_message_ajax(request, session_id):
             
         content = request.POST.get('content')
         if content:
+            # Check if this is the first message from the astrologer to start the timer
+            timer_started = False
+            if request.user == session.astrologer and not session.actual_start_time:
+                session.actual_start_time = timezone.now()
+                session.save()
+                timer_started = True
+
             msg = ChatMessage.objects.create(
                 session=session,
                 sender=request.user,
@@ -374,6 +316,71 @@ def send_message_ajax(request, session_id):
                 'sender_id': msg.sender.id,
                 'content': msg.content,
                 'timestamp': msg.timestamp.strftime('%H:%M'),
-                'iso_timestamp': msg.timestamp.isoformat()
+                'iso_timestamp': msg.timestamp.isoformat(),
+                'timer_started': timer_started,
+                'is_astrologer': request.user == session.astrologer
             })
     return JsonResponse({'error': 'Invalid request'}, status=400)
+
+@login_required
+def end_chat(request, session_id):
+    from django.utils import timezone
+    session = get_object_or_404(ChatSession, id=session_id)
+    
+    # Only astrologer can end the chat
+    if session.astrologer != request.user:
+        return redirect('home')
+    
+    # Mark session as inactive and set end time
+    session.is_active = False
+    session.end_time = timezone.now()
+    session.save()
+    
+    # Calculate duration and deduct wallet
+    try:
+        if session.actual_start_time:
+            duration_minutes = (session.end_time - session.actual_start_time).total_seconds() / 60
+            # Ensure at least 1 minute is charged if connected and timer started
+            duration_minutes = max(1, duration_minutes)
+            
+            # Get price rate
+            astrologer_profile = session.astrologer.astrologer_profile
+            rate = astrologer_profile.chat_price_per_minute
+            cost = getattr(rate, 'real', rate) * getattr(duration_minutes, 'real', duration_minutes)
+            from decimal import Decimal
+            cost = Decimal(cost)
+            
+            # Deduct from customer
+            session.customer.profile.deduct_wallet(cost, description=f"Chat Consultation with {session.astrologer.username}")
+            
+            # Credit to astrologer
+            session.astrologer.profile.credit_wallet(cost, description=f"Chat Consultation with {session.customer.username}")
+            
+            # print("Chat ended but timer never started (Astrologer didn't reply). No deduction.")
+            
+    except Exception as e:
+        # import traceback
+        # traceback.print_exc()
+        pass
+    
+    # Delete all messages in this session
+    ChatMessage.objects.filter(session=session).delete()
+    
+    # Find and complete the associated booking
+    try:
+        # Try to find the most recent pending or approved chat booking
+        booking = Booking.objects.filter(
+            user=session.customer,
+            astrologer__user=session.astrologer,
+            consultation_type='chat'
+        ).filter(
+            status__in=['pending', 'approved']
+        ).order_by('-scheduled_at').first()
+        
+        if booking:
+            booking.status = 'completed'
+            booking.save()
+    except Exception as e:
+        pass
+    
+    return redirect('consultations:astrologer_dashboard')

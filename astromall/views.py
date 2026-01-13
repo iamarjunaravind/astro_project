@@ -34,6 +34,29 @@ def product_list(request):
         'active_category': category_name
     })
 
+def pooja_list(request):
+    """
+    Dedicated view for Book a Pooja feature.
+    Filters products by 'Pooja' category and sets a custom page title.
+    """
+    category_name = 'Pooja'
+    products = Product.objects.filter(category__name=category_name)
+    
+    # Optional search within poojas
+    query = request.GET.get('q')
+    if query:
+        products = products.filter(
+            Q(name__icontains=query) |
+            Q(description__icontains=query)
+        ).distinct()
+    
+    return render(request, 'astromall/list.html', {
+        'products': products,
+        'active_category': category_name,
+        'page_title': 'Book a Sacred Pooja',
+        'hide_categories': True
+    })
+
 def product_detail(request, pk):
     product = get_object_or_404(Product, pk=pk)
     return render(request, 'astromall/detail.html', {'product': product})
@@ -45,7 +68,15 @@ def add_to_cart(request, product_id):
     
     if not created:
         cart_item.quantity += 1
-        cart_item.save()
+    
+    # Capture Pooja details if present
+    if request.method == 'POST':
+        cart_item.devotee_name = request.POST.get('devotee_name')
+        cart_item.contact_number = request.POST.get('contact_number')
+        cart_item.dob = request.POST.get('dob')
+        cart_item.birth_time = request.POST.get('birth_time')
+    
+    cart_item.save()
     
     messages.success(request, f"{product.name} added to your cart.")
     return redirect('astromall:view_cart')
@@ -117,7 +148,12 @@ def checkout(request):
             product=item.product,
             product_name=item.product.name,
             price=item.product.price,
-            quantity=item.quantity
+            quantity=item.quantity,
+            # Transfer Pooja booking details
+            devotee_name=item.devotee_name,
+            contact_number=item.contact_number,
+            dob=item.dob,
+            birth_time=item.birth_time
         )
     
     cart_items.delete()
@@ -140,7 +176,12 @@ def initiate_payment(request):
         from .models import OrderDetail
         OrderDetail.objects.create(
             order=order, product=item.product, product_name=item.product.name, 
-            price=item.product.price, quantity=item.quantity
+            price=item.product.price, quantity=item.quantity,
+            # Transfer Pooja booking details
+            devotee_name=item.devotee_name,
+            contact_number=item.contact_number,
+            dob=item.dob,
+            birth_time=item.birth_time
         )
     
     # Now create Razorpay order

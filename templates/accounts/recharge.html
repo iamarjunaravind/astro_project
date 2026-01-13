@@ -1,0 +1,153 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block content %}
+<div class="container section">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-5">
+            <div class="card border-0 shadow-sm rounded-4">
+                <div class="card-body p-4 p-md-5">
+                    <div class="text-center mb-4">
+                        <i class="bi bi-wallet2 text-danger" style="font-size: 3rem;"></i>
+                        <h2 class="fw-bold mt-3">{% trans "Recharge Wallet" %}</h2>
+                        <p class="text-muted">{% trans "Add money to your wallet for consultations" %}</p>
+                    </div>
+
+                    <div class="bg-light p-3 rounded-3 mb-4 text-center">
+                        <small class="text-muted d-block uppercase tracking-wide">{% trans "Current Balance" %}</small>
+                        <span class="h2 fw-bold text-danger">₹{{ user.profile.wallet_balance }}</span>
+                    </div>
+
+                    <form id="recharge-form" onsubmit="initiatePayment(event)">
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">{% trans "Enter Amount (INR)" %}</label>
+                            <div class="input-group input-group-lg">
+                                <span class="input-group-text bg-white border-end-0">₹</span>
+                                <input type="number" id="amount" name="amount" class="form-control border-start-0 ps-0"
+                                    placeholder="100" min="1" required>
+                            </div>
+                            <div class="form-text mt-2">
+                                <span class="badge bg-light text-dark border me-1 cursor-pointer"
+                                    onclick="setAmount(100)">₹100</span>
+                                <span class="badge bg-light text-dark border me-1 cursor-pointer"
+                                    onclick="setAmount(200)">₹200</span>
+                                <span class="badge bg-light text-dark border me-1 cursor-pointer"
+                                    onclick="setAmount(500)">₹500</span>
+                                <span class="badge bg-light text-dark border me-1 cursor-pointer"
+                                    onclick="setAmount(1000)">₹1000</span>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-danger w-100 py-3 rounded-pill fw-bold shadow-sm"
+                            id="pay-btn">
+                            {% trans "Add Money" %}
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+    function setAmount(val) {
+        document.getElementById('amount').value = val;
+    }
+
+    function initiatePayment(e) {
+        e.preventDefault();
+        const amount = document.getElementById('amount').value;
+        const btn = document.getElementById('pay-btn');
+
+        if (!amount || amount < 1) {
+            alert("Please enter a valid amount");
+            return;
+        }
+
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Processing...';
+
+        // Create Order
+        const formData = new FormData();
+        formData.append('amount', amount);
+        formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
+
+        fetch("{% url 'accounts:recharge' %}", {
+            method: 'POST',
+            body: formData
+        })
+            .then(res => res.json())
+            .then(data => {
+                if (data.error) {
+                    alert(data.error);
+                    btn.disabled = false;
+                    btn.innerText = "{% trans 'Add Money' %}";
+                    return;
+                }
+
+                const options = {
+                    "key": data.key_id,
+                    "amount": data.amount,
+                    "currency": "INR",
+                    "name": "Astrology Platform",
+                    "description": "Wallet Recharge",
+                    "image": "https://cdn-icons-png.flaticon.com/512/2666/2666508.png", // Replace with your logo
+                    "order_id": data.order_id,
+                    "handler": function (response) {
+                        verifyPayment(response, data.amount);
+                    },
+                    "prefill": {
+                        "name": data.user_name,
+                        "email": data.user_email,
+                        "contact": data.user_phone
+                    },
+                    "theme": {
+                        "color": "#dc3545"
+                    }
+                };
+                const rzp1 = new Razorpay(options);
+                rzp1.on('payment.failed', function (response) {
+                    alert("Payment Failed: " + response.error.description);
+                    btn.disabled = false;
+                    btn.innerText = "{% trans 'Add Money' %}";
+                });
+                rzp1.open();
+            })
+            .catch(err => {
+                console.error(err);
+                alert("Something went wrong");
+                btn.disabled = false;
+                btn.innerText = "{% trans 'Add Money' %}";
+            });
+    }
+
+    function verifyPayment(response, amount) {
+        const payload = {
+            razorpay_order_id: response.razorpay_order_id,
+            razorpay_payment_id: response.razorpay_payment_id,
+            razorpay_signature: response.razorpay_signature,
+            amount: amount
+        };
+
+        fetch("{% url 'accounts:verify_payment' %}", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            body: JSON.stringify(payload)
+        })
+            .then(res => res.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    alert("Recharge Successful!");
+                    window.location.reload();
+                } else {
+                    alert("Verification Failed: " + data.error);
+                }
+            });
+    }
+</script>
+{% endblock %}

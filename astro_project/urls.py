@@ -21,7 +21,8 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
-from .views import home_view
+from django.conf.urls.static import static
+from .views import home_view, privacy_policy, terms_of_service, refund_policy
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -34,6 +35,9 @@ urlpatterns = [
     path('blog/', include('blog.urls', namespace='blog')),
     path('kundali/', include('kundali.urls', namespace='kundali')),
     path('i18n/', include('django.conf.urls.i18n')),
+    path('privacy-policy/', privacy_policy, name='privacy_policy'),
+    path('terms-and-conditions/', terms_of_service, name='terms_of_service'),
+    path('refund-policy/', refund_policy, name='refund_policy'),
 ]
 
 if settings.DEBUG:

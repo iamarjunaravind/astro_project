@@ -35,15 +35,16 @@
                         {{ session.astrologer.username }}
                         {% else %}
                         {{ session.customer.get_full_name|default:session.customer.username }}
-                        <small class="text-muted d-block" style="font-size: 12px;">
-                            {{ session.customer.email }}
-                            {% if session.customer.profile.phone_number %}
-                            href="tel:{{ session.customer.profile.phone_number }}" class="text-decoration-none">{{ session.customer.profile.phone_number }}</a>
-                            {% endif %}
-                        </small>
                         {% endif %}
                     </h5>
-                    <small class="text-success">● Online</small>
+                    <small id="chat-status-badge"
+                        class="{% if session.actual_start_time %}text-success{% else %}text-warning{% endif %}">
+                        {% if session.actual_start_time %}
+                        ● Session Started
+                        {% else %}
+                        ● Waiting for Astrologer...
+                        {% endif %}
+                    </small>
                 </div>
             </div>
             {% if user == session.astrologer %}
@@ -51,7 +52,8 @@
                 onclick="return confirm('Are you sure you want to end this chat?');"><i
                     class="bi bi-x-circle-fill me-1"></i> {% trans "Quit & Mark Completed" %}</a>
             {% else %}
-            <a href="{% url 'consultations:my_bookings' %}" class="btn btn-outline-secondary btn-sm rounded-pill">{% trans "Back" %}</a>
+            <a href="{% url 'consultations:my_bookings' %}" class="btn btn-outline-secondary btn-sm rounded-pill">{%
+                trans "Back" %}</a>
             {% endif %}
         </div>
 
@@ -64,7 +66,8 @@
                 <div
                     style="max-width: 75%; padding: 10px 15px; border-radius: 15px; {% if message.sender == user %}background: #bd0000; color: white; border-bottom-right-radius: 2px;{% else %}background: white; border: 1px solid #ddd; border-bottom-left-radius: 2px;{% endif %}">
                     <p class="mb-1">{{ message.content }}</p>
-                    <small style="font-size: 11px; opacity: 0.8; display: block; text-align: right;">{{ message.timestamp|date:"H:i" }}</small>
+                    <small style="font-size: 11px; opacity: 0.8; display: block; text-align: right;">{{
+                        message.timestamp|date:"H:i" }}</small>
                 </div>
             </div>
             {% endfor %}
@@ -125,6 +128,15 @@
                         input.value = '';
                         appendMessage(data);
                         lastId = data.id;
+
+                        // Update status if timer started
+                        if (data.timer_started) {
+                            const badge = document.getElementById('chat-status-badge');
+                            if (badge) {
+                                badge.className = 'text-success';
+                                badge.innerText = '● Session Started';
+                            }
+                        }
                     }
                 })
                 .catch(err => console.error("Send error:", err));

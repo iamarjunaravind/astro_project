@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "Refund Policy" %} - Pujya{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <h1 class="mb-4">{% trans "Refund & Cancellation Policy" %}</h1>
+            <p class="text-muted">{% trans "Last Updated: January 2025" %}</p>
+
+            <div class="card shadow-sm border-0">
+                <div class="card-body p-4">
+                    <h5>1. {% trans "Consultations" %}</h5>
+                    <p>{% trans "If an astrologer does not show up for a scheduled consultation, a full refund will be
+                        processed to your original payment method. If you are not satisfied with a consultation, please
+                        contact support within 24 hours for a review." %}</p>
+
+                    <h5>2. {% trans "Digital Products" %}</h5>
+                    <p>{% trans "Due to the nature of digital content (e.g., horoscopes, reports), all sales constitute
+                        a final sale and are generally non-refundable unless there is a technical error in the report
+                        generation." %}</p>
+
+                    <h5>3. {% trans "Physical Products" %}</h5>
+                    <p>{% trans "Physical items (e.g., gemstones) can be returned within 7 days of delivery only if they
+                        are damaged or defective upon arrival. Please retain original packaging." %}</p>
+
+                    <h5>4. {% trans "Cancellation" %}</h5>
+                    <p>{% trans "You can cancel a scheduled consultation up to 4 hours before the appointment time for a
+                        full refund. Cancellations made within 4 hours may be subject to a cancellation fee." %}</p>
+
+                    <h5>5. {% trans "Processing Time" %}</h5>
+                    <p>{% trans "Approved refunds are typically processed within 5-7 business days." %}</p>
+
+                    <h5 class="mt-4">{% trans "Contact Us" %}</h5>
+                    <p>{% trans "For any refund requests, please email us at support@pujya.com with your order details."
+                        %}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

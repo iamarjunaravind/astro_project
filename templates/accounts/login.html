@@ -112,6 +112,15 @@
         background: rgb(140, 10, 10);
     }
 
+    .otp-btn {
+        background: #2b2b2b;
+        margin-top: 0.5rem;
+    }
+
+    .otp-btn:hover {
+        background: #000;
+    }
+
     .auth-footer {
         text-align: center;
         margin-top: 1.5rem;
@@ -128,23 +137,33 @@
     .auth-footer a:hover {
         text-decoration: underline;
     }
+
+    #recaptcha-container {
+        margin-top: 1rem;
+    }
 </style>
+
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth-compat.js"></script>
 
 <div class="auth-page-wrapper">
     <div class="premium-card">
         <div class="auth-header">
-            <h1 class="auth-title">Login to continue</h1>
-            <!-- <p class="auth-subtitle">Sign in to continue your journey</p> -->
+            <h1 class="auth-title">Login</h1>
+            <p class="auth-subtitle" id="auth-subtitle">Sign in to continue</p>
         </div>
 
-        <form method="post">
+        <!-- Password Login Form -->
+        <form method="post" id="password-login-form">
             {% csrf_token %}
 
             {% for field in form %}
             <div class="form-group">
                 <label for="{{ field.id_for_label }}">{{ field.label }}</label>
                 <input type="{{ field.field.widget.input_type }}" name="{{ field.name }}" id="{{ field.id_for_label }}"
-                    class="custom-input" value="{{ field.value|default:'' }}" {{ field.field.required|yesno:'required,' }}>
+                    class="custom-input" value="{{ field.value|default:'' }}" {{ field.field.required|yesno:'required,'
+                    }}>
                 {% if field.errors %}
                 <div class="text-danger small mt-1">
                     {{ field.errors.0 }}
@@ -156,9 +175,182 @@
             <button type="submit" class="submit-btn">Login</button>
         </form>
 
+        <!-- OTP Login Form (Hidden by default) -->
+        <div id="otp-login-form" style="display: none;">
+            <div id="phone-step">
+                <div class="form-group">
+                    <label>Phone Number</label>
+                    <input type="text" id="phone-number" class="custom-input" placeholder="+1234567890">
+                </div>
+                <div id="recaptcha-container"></div>
+                <button type="button" class="submit-btn otp-btn" onclick="sendOTP()">Send OTP</button>
+            </div>
+
+            <div id="otp-step" style="display: none;">
+                <div class="form-group">
+                    <label>Enter OTP</label>
+                    <input type="text" id="otp-code" class="custom-input" placeholder="123456">
+                </div>
+                <button type="button" class="submit-btn" onclick="verifyOTP()">Verify & Login</button>
+
+                <div class="d-flex justify-content-between align-items-center mt-2">
+                    <span id="resend-timer" class="text-muted small"></span>
+                    <button type="button" id="resend-otp-btn" class="submit-btn" onclick="resendLoginOTP()" disabled
+                        style="display: none; background: transparent; color: rgb(171, 13, 13); border: none; font-size: 0.9rem; width: auto; padding: 0; margin-top: 0;">
+                        Resend OTP
+                    </button>
+                </div>
+            </div>
+            <div id="otp-message" class="text-danger mt-2 small"></div>
+        </div>
+
+        <button type="button" class="submit-btn"
+            style="background: transparent; color: #666; border: 1px solid #ccc; margin-top: 1rem;"
+            onclick="toggleAuthMethod()" id="toggle-btn">
+            Login with OTP
+        </button>
+
         <div class="auth-footer">
             Don't have an account? <a href="{% url 'accounts:register' %}">Create Account</a>
         </div>
     </div>
 </div>
+
+<script>
+    // Firebase Config - TODO: Replace with your config
+    const firebaseConfig = {
+        apiKey: "AIzaSyDIK21gsztqVXyFiLsVPl6mEL88HOE3RZA",
+        authDomain: "otp-login-829df.firebaseapp.com",
+        projectId: "otp-login-829df",
+        storageBucket: "otp-login-829df.firebasestorage.app",
+        messagingSenderId: "1087833694576",
+        appId: "1:1087833694576:web:cd263c632c4c1c7cdb2fb5",
+        measurementId: "G-02T41LGZ8J"
+    };
+
+    // Initialize Firebase
+    if (!firebase.apps.length) {
+        firebase.initializeApp(firebaseConfig);
+    }
+
+    let confirmationResult = null;
+    let isOtpMode = false;
+    let resendTimerInterval;
+    let resendCooldown = 30;
+
+    function toggleAuthMethod() {
+        const passwordForm = document.getElementById('password-login-form');
+        const otpForm = document.getElementById('otp-login-form');
+        const toggleBtn = document.getElementById('toggle-btn');
+        const subtitle = document.getElementById('auth-subtitle');
+
+        isOtpMode = !isOtpMode;
+
+        if (isOtpMode) {
+            passwordForm.style.display = 'none';
+            otpForm.style.display = 'block';
+            toggleBtn.textContent = 'Login with Password';
+            subtitle.textContent = 'Login with your phone number';
+
+            if (!window.recaptchaVerifier) {
+                window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
+                    'size': 'normal',
+                    'callback': (response) => {
+                        // reCAPTCHA solved, allow signInWithPhoneNumber.
+                    }
+                });
+                window.recaptchaVerifier.render();
+            }
+        } else {
+            passwordForm.style.display = 'block';
+            otpForm.style.display = 'none';
+            toggleBtn.textContent = 'Login with OTP';
+            subtitle.textContent = 'Sign in to continue';
+        }
+    }
+
+    function sendOTP() {
+        const phoneNumber = document.getElementById('phone-number').value;
+        const appVerifier = window.recaptchaVerifier;
+
+        // Reset UI for resend
+        const resendBtn = document.getElementById('resend-otp-btn');
+        if (resendBtn) resendBtn.style.display = 'none';
+
+        firebase.auth().signInWithPhoneNumber(phoneNumber, appVerifier)
+            .then((result) => {
+                confirmationResult = result;
+                document.getElementById('phone-step').style.display = 'none';
+                document.getElementById('otp-step').style.display = 'block';
+                document.getElementById('otp-message').textContent = '';
+
+                // Start Timer
+                startResendTimer();
+
+            }).catch((error) => {
+                document.getElementById('otp-message').textContent = "Error: " + error.message;
+            });
+    }
+
+    function startResendTimer() {
+        resendCooldown = 30;
+        const resendBtn = document.getElementById('resend-otp-btn');
+        const timerDisplay = document.getElementById('resend-timer');
+
+        if (resendBtn) {
+            resendBtn.style.display = 'inline-block';
+            resendBtn.disabled = true;
+            resendBtn.textContent = "Resend OTP";
+        }
+
+        clearInterval(resendTimerInterval);
+
+        if (timerDisplay) timerDisplay.textContent = `Resend available in ${resendCooldown}s`;
+
+        resendTimerInterval = setInterval(() => {
+            resendCooldown--;
+            if (timerDisplay) timerDisplay.textContent = `Resend available in ${resendCooldown}s`;
+
+            if (resendCooldown <= 0) {
+                clearInterval(resendTimerInterval);
+                if (timerDisplay) timerDisplay.textContent = "";
+                if (resendBtn) resendBtn.disabled = false;
+            }
+        }, 1000);
+    }
+
+    function resendLoginOTP() {
+        sendOTP();
+    }
+
+    function verifyOTP() {
+        const code = document.getElementById('otp-code').value;
+        confirmationResult.confirm(code).then((result) => {
+            const user = result.user;
+            user.getIdToken().then((idToken) => {
+                // Send token to backend
+                fetch("{% url 'accounts:verify_phone_auth' %}", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        idToken: idToken,
+                        action: 'login'
+                    })
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            window.location.href = data.redirect_url;
+                        } else {
+                            document.getElementById('otp-message').textContent = data.message;
+                        }
+                    });
+            });
+        }).catch((error) => {
+            document.getElementById('otp-message').textContent = "Invalid OTP";
+        });
+    }
+</script>
 {% endblock %}

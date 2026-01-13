@@ -22,6 +22,7 @@ class AstrologerProfile(models.Model):
     chat_price_per_minute = models.DecimalField(max_digits=6, decimal_places=2, default=10.00)
     call_price_per_minute = models.DecimalField(max_digits=6, decimal_places=2, default=15.00)
     rating = models.DecimalField(max_digits=3, decimal_places=2, default=0.0)
+    is_verified = models.BooleanField(default=False)
     
     def __str__(self):
         return f"Astrologer {self.user.username}"

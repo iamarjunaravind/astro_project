@@ -1,0 +1,307 @@
+
+import os
+
+base_html_path = r"c:\Users\abc\Documents\Custom Office Templates\astro_project\templates\base.html"
+
+content = """<!DOCTYPE html>
+{% load i18n %}
+<html lang="{{ LANGUAGE_CODE }}">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{% trans "Astrology Platform" %}{% endblock %}</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+
+    <!-- PWA Manifest & Meta -->
+    <link rel="manifest" href="{% static 'manifest.json' %}">
+    <meta name="theme-color" content="#dc3545">
+</head>
+
+<body>
+
+    <header>
+        <nav class="navbar navbar-expand-lg navbar-light bg-white fixed-top shadow-sm">
+            <div class="container container-lg px-2">
+
+                <!-- Hamburger (mobile only) -->
+                <button class="navbar-toggler d-lg-none me-2" type="button" data-bs-toggle="offcanvas"
+                    data-bs-target="#mobileNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Logo -->
+                <a class="navbar-brand fw-bold" href="/">Pujya</a>
+
+                <!-- Desktop menu -->
+                <div class="collapse navbar-collapse d-none d-lg-flex">
+                    <ul class="navbar-nav mx-auto gap-lg-3">
+                        <li class="nav-item"><a class="nav-link" href="/">{% trans "Home" %}</a></li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'astrologers:astrologer_list' %}">{% trans "Talk with Astrologer" %}</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'astromall:product_list' %}">{% trans "Astromall" %}</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'blog:blog_list' %}">{% trans "Blog" %}</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'kundali:kundali_form' %}">{% trans "Kundali" %}</a>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="horoscopeDropdown" role="button"
+                                data-bs-toggle="dropdown" aria-expanded="false">
+                                {% trans "Horoscopes" %}
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="horoscopeDropdown">
+                                <li><a class="dropdown-item" href="{% url 'horoscope:horoscope_daily' day='today' %}">{% trans "Today" %}</a></li>
+                                <li><a class="dropdown-item"
+                                        href="{% url 'horoscope:horoscope_daily' day='tomorrow' %}">{% trans "Tomorrow" %}</a></li>
+                                <li><a class="dropdown-item"
+                                        href="{% url 'horoscope:horoscope_daily' day='yesterday' %}">{% trans "Yesterday" %}</a></li>
+                                <li>
+                                    <hr class="dropdown-divider">
+                                </li>
+                                <li><a class="dropdown-item" href="{% url 'horoscope:horoscope_weekly' %}">{% trans "Weekly" %}</a></li>
+                                <li><a class="dropdown-item" href="{% url 'horoscope:horoscope_monthly' %}">{% trans "Monthly" %}</a></li>
+                                <li><a class="dropdown-item" href="{% url 'horoscope:horoscope_yearly' %}">{% trans "Yearly" %}</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Cart and Login -->
+                <div class="ms-auto" style="display: flex; gap: 10px; align-items: center;">
+                    {% if user.is_authenticated %}
+                    <div class="d-flex align-items-center me-3">
+                        <form action="{% url 'set_language' %}" method="post" class="d-flex align-items-center">
+                            {% csrf_token %}
+                            <input name="next" type="hidden" value="{{ request.get_full_path }}">
+                            <select name="language" onchange="this.form.submit()"
+                                class="form-select form-select-sm border-0 bg-light"
+                                style="width: auto; cursor: pointer;">
+                                {% get_current_language as CURRENT_LANG %}
+                                {% get_available_languages as LANGUAGES %}
+                                {% for lang in LANGUAGES %}
+                                <option value="{{ lang.0 }}" {% if lang.0 == CURRENT_LANG %}selected{% endif %}
+                                    data-name="{{ lang.1 }}" data-code="{{ lang.0|upper }}">
+                                    {{ lang.1 }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </form>
+                    </div>
+
+                    <script>
+                        function updateLanguageLabels() {
+                            const isMobile = window.innerWidth < 992;
+                            document.querySelectorAll('select[name="language"] option').forEach(opt => {
+                                if (opt.dataset.code && opt.dataset.name) {
+                                    opt.textContent = isMobile ? opt.dataset.code : opt.dataset.name;
+                                }
+                            });
+                        }
+                        window.addEventListener('resize', updateLanguageLabels);
+                        document.addEventListener('DOMContentLoaded', updateLanguageLabels);
+                        updateLanguageLabels();
+                    </script>
+
+                    {% if user.profile %}
+                    <a href="{% url 'accounts:recharge_page' %}"
+                        class="btn btn-sm btn-outline-danger me-3 d-none d-lg-block rounded-pill fw-bold"
+                        style="white-space: nowrap;">
+                        <i class="bi bi-wallet2"></i> \u20B9{{ user.profile.wallet_balance|floatformat:0 }}
+                    </a>
+                    {% endif %}
+
+                    <a href="{% url 'astromall:view_cart' %}"
+                        class="btn btn-light position-relative me-3 shadow-sm border-0 d-flex align-items-center justify-content-center"
+                        style="width: 42px; height: 42px; border-radius: 10px; background: #fff;">
+                        <i class="bi bi-cart3 text-danger fs-5"></i>
+                        {% if user.cart_items.count > 0 %}
+                        <span
+                            class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger shadow-sm border border-2 border-white"
+                            style="font-size: 0.7rem; padding: 0.35em 0.65em;">
+                            {{ user.cart_items.count }}
+                        </span>
+                        {% endif %}
+                    </a>
+
+                    <div class="dropdown">
+                        <a class="btn btn-light shadow-sm border-0 d-flex align-items-center justify-content-center dropdown-toggle"
+                            href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-expanded="false"
+                            style="width: 42px; height: 42px; border-radius: 10px; background: #fff;">
+                            <i class="bi bi-person-circle text-danger fs-5"></i>
+                        </a>
+
+                        <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0"
+                            aria-labelledby="dropdownMenuLink">
+                            {% if user.astrologer_profile %}
+                            <li><a class="dropdown-item d-flex align-items-center gap-2"
+                                    href="{% url 'consultations:astrologer_dashboard' %}"><i
+                                        class="bi bi-speedometer2"></i> {% trans "Astrologer Dashboard" %}</a></li>
+                            {% endif %}
+                            <li><a class="dropdown-item d-flex align-items-center gap-2"
+                                    href="{% url 'accounts:profile' %}"><i class="bi bi-person-fill"></i> {% trans "Profile" %}</a></li>
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
+                            <li><a class="dropdown-item d-flex align-items-center gap-2 text-danger"
+                                    href="{% url 'accounts:logout' %}"><i class="bi bi-box-arrow-right"></i> {% trans "Logout" %}</a></li>
+                        </ul>
+                    </div>
+                    {% else %}
+                    <a href="{% url 'accounts:login' %}"
+                        class="login-btn d-flex align-items-center gap-1 text-decoration-none">
+                        <i class="bi bi-person-circle"></i> {% trans "Login" %}
+                    </a>
+                    {% endif %}
+                </div>
+
+            </div>
+        </nav>
+
+        <div class="offcanvas offcanvas-start d-lg-none" tabindex="-1" id="mobileNav">
+
+            <div class="offcanvas-header border-bottom">
+                <h5 class="offcanvas-title fw-bold">{% trans "Menu" %}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
+            </div>
+
+            <div class="offcanvas-body p-0">
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item"><a href="/" class="text-decoration-none text-dark">{% trans "Home" %}</a></li>
+                    <li class="list-group-item"><a href="{% url 'astrologers:astrologer_list' %}"
+                            class="text-decoration-none text-dark">{% trans "Chat with Astrologer" %}</a></li>
+                    <li class="list-group-item"><a href="{% url 'astromall:product_list' %}"
+                            class="text-decoration-none text-dark">{% trans "Astromall" %}</a></li>
+                    <li class="list-group-item">
+                        <a class="d-flex align-items-center justify-content-between text-decoration-none text-dark"
+                            data-bs-toggle="collapse" href="#mobileHoroscopeCollapse" role="button"
+                            aria-expanded="false" aria-controls="mobileHoroscopeCollapse">
+                            {% trans "Horoscopes" %} <i class="bi bi-chevron-down"></i>
+                        </a>
+                        <div class="collapse mt-2" id="mobileHoroscopeCollapse">
+                            <ul class="list-group list-group-flush ps-3">
+                                <li class="list-group-item border-0 p-1"><a
+                                        href="{% url 'horoscope:horoscope_daily' day='today' %}"
+                                        class="text-decoration-none text-secondary">{% trans "Today" %}</a></li>
+                                <li class="list-group-item border-0 p-1"><a
+                                        href="{% url 'horoscope:horoscope_daily' day='tomorrow' %}"
+                                        class="text-decoration-none text-secondary">{% trans "Tomorrow" %}</a></li>
+                                <li class="list-group-item border-0 p-1"><a
+                                        href="{% url 'horoscope:horoscope_daily' day='yesterday' %}"
+                                        class="text-decoration-none text-secondary">{% trans "Yesterday" %}</a></li>
+                                <li class="list-group-item border-0 p-1"><a
+                                        href="{% url 'horoscope:horoscope_weekly' %}"
+                                        class="text-decoration-none text-secondary">{% trans "Weekly" %}</a></li>
+                                <li class="list-group-item border-0 p-1"><a
+                                        href="{% url 'horoscope:horoscope_monthly' %}"
+                                        class="text-decoration-none text-secondary">{% trans "Monthly" %}</a></li>
+                                <li class="list-group-item border-0 p-1"><a
+                                        href="{% url 'horoscope:horoscope_yearly' %}"
+                                        class="text-decoration-none text-secondary">{% trans "Yearly" %}</a></li>
+                            </ul>
+                        </div>
+                    </li>
+                    <li class="list-group-item"><a href="#" class="text-decoration-none text-dark">{% trans "Blogs" %}</a></li>
+                    {% if user.is_authenticated %}
+                    {% if user.astrologer_profile %}
+                    <li class="list-group-item"><a href="{% url 'consultations:astrologer_dashboard' %}"
+                            class="text-decoration-none text-dark">{% trans "Astrologer Dashboard" %}</a></li>
+                    {% endif %}
+                    <li class="list-group-item"><a href="{% url 'accounts:profile' %}"
+                            class="text-decoration-none text-dark">{% trans "Profile" %}</a></li>
+                    <li class="list-group-item"><a href="{% url 'accounts:logout' %}"
+                            class="text-decoration-none text-danger">{% trans "Logout" %}</a></li>
+                    {% else %}
+                    <li class="list-group-item"><a href="{% url 'accounts:login' %}"
+                            class="text-decoration-none text-dark">{% trans "Login" %}</a></li>
+                    {% endif %}
+                </ul>
+            </div>
+
+        </div>
+    </header>
+
+    <main>
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    <footer>
+        <div class="footer-grid">
+            <div>
+                <h4>{% trans "Astrology" %}</h4>
+                <ul>
+                    <li>{% trans "Kundli" %}</li>
+                    <li>{% trans "Horoscope" %}</li>
+                    <li>{% trans "Compatibility" %}</li>
+                </ul>
+            </div>
+            <div>
+                <h4>{% trans "Shop" %}</h4>
+                <ul>
+                    <li>{% trans "Gemstones" %}</li>
+                    <li>{% trans "Rudraksha" %}</li>
+                </ul>
+            </div>
+            <div>
+                <h4>{% trans "Contact" %}</h4>
+                <ul>
+                    <li>{% trans "24x7 Chat" %}</li>
+                    <li>{% trans "Email Support" %}</li>
+                </ul>
+            </div>
+            <div>
+                <h4>{% trans "Secure" %}</h4>
+                <ul>
+                    <li>{% trans "Verified Astrologers" %}</li>
+                    <li>{% trans "Secure Payments" %}</li>
+                    <li><a href="{% url 'privacy_policy' %}" class="text-decoration-none text-muted">{% trans "Privacy Policy" %}</a></li>
+                    <li><a href="{% url 'terms_of_service' %}" class="text-decoration-none text-muted">{% trans "Terms of Service" %}</a></li>
+                    <li><a href="{% url 'refund_policy' %}" class="text-decoration-none text-muted">{% trans "Refund Policy" %}</a></li>
+                </ul>
+            </div>
+        </div>
+    </footer>
+
+    <div class="copyright">
+        &copy; 2025 {% trans "Astrology Platform. All Rights Reserved" %}
+    </div>
+
+    <div class="gift">🎁 {% trans "Claim FREE gift" %}</div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{% static 'js/main.js' %}"></script>
+
+    <!-- PWA Service Worker Registration -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function () {
+                navigator.serviceWorker.register("{% static 'js/service-worker.js' %}")
+                    .then(function (registration) {
+                        console.log('ServiceWorker registration successful with scope: ', registration.scope);
+                    }, function (err) {
+                        console.log('ServiceWorker registration failed: ', err);
+                    });
+            });
+        }
+    </script>
+    {% block extra_js %}{% endblock %}
+</body>
+
+</html>"""
+
+with open(base_html_path, "w", encoding='utf-8') as f:
+    f.write(content)
+
+print(f"Successfully overwrote {base_html_path}")

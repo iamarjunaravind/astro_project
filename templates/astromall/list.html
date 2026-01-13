@@ -72,10 +72,11 @@
 </style>
 
 <div class="container section">
-    <h1 class="text-center mb-4 astromall-title">Astromall</h1>
+    <h1 class="text-center mb-4 astromall-title">{{ page_title|default:"Astromall" }}</h1>
 
     <!-- Search Section -->
-    <form method="GET" class="d-flex gap-2 mb-4 justify-content-center px-2">
+    <!-- Search Section -->
+    <form method="GET" class="d-none d-sm-flex gap-2 mb-4 justify-content-center px-2">
         <input type="text" name="q" class="form-control w-auto" placeholder="Search..." value="{{ request.GET.q }}">
         {% if active_category %}
         <input type="hidden" name="category" value="{{ active_category }}">
@@ -83,21 +84,43 @@
         <button type="submit" class="btn btn-dark btn-sm">Search</button>
     </form>
 
+    <!-- Mobile Search & Filter -->
+    <form method="GET" class="d-block d-sm-none mb-4 px-2">
+        <div class="row g-2">
+            <div class="col-6">
+                <select name="category" class="form-select form-select-sm" onchange="this.form.submit()">
+                    <option value="">All Categories</option>
+                    {% for cat in categories %}
+                    <option value="{{ cat.name }}" {% if active_category == cat.name %}selected{% endif %}>{{ cat.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-6">
+                <div class="input-group input-group-sm">
+                    <input type="text" name="q" class="form-control" placeholder="Search..." value="{{ request.GET.q }}">
+                    <button type="submit" class="btn btn-dark"><i class="bi bi-search"></i></button>
+                </div>
+            </div>
+        </div>
+    </form>
+
     <!-- Filter Categories -->
-    <div class="category-scroll mb-5 px-2">
+    {% if not hide_categories %}
+    <div class="category-scroll d-none d-sm-flex mb-5 px-2">
         <a href="{% url 'astromall:product_list' %}{% if request.GET.q %}?q={{ request.GET.q }}{% endif %}"
             class="btn btn-sm {% if not active_category %}btn-dark{% else %}btn-outline-dark{% endif %} rounded-pill px-4">All</a>
         {% for cat in categories %}
         <a href="?category={{ cat.name }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}"
-            class="btn btn-sm {% if active_category == cat.name %}btn-dark{% else %}btn-outline-dark{% endif %} rounded-pill px-4">{{
-            cat.name }}</a>
+            class="btn btn-sm {% if active_category == cat.name %}btn-dark{% else %}btn-outline-dark{% endif %} rounded-pill px-4">
+            {{ cat.name }}</a>
         {% endfor %}
     </div>
+    {% endif %}
 
     <div class="row g-4 px-1">
         {% for product in products %}
         <div class="col-lg-3 col-md-4 col-6">
-            <div class="card h-100 border p-2">
+            <div class="card h-100 border p-2" onclick="window.location.href='{% url 'astromall:product_detail' product.pk %}'" style="cursor: pointer;">
                 {% if product.image %}
                 <img src="{{ product.image.url }}" alt="{{ product.name }}" class="rounded mb-2"
                     style="height: 180px; object-fit: cover;">
@@ -109,9 +132,7 @@
                 <p class="text-danger fs-5 fw-bold mb-1">₹{{ product.price }}</p>
                 <p class="text-muted small d-none d-sm-block">{{ product.description|truncatewords:8 }}</p>
                 <div class="mt-auto d-flex flex-column gap-2">
-                    <a href="{% url 'astromall:product_detail' product.pk %}"
-                        class="btn btn-sm btn-outline-dark rounded-pill">Details</a>
-                    <div class="d-flex gap-1">
+                    <div class="d-flex gap-1" onclick="event.stopPropagation();">
                         <a href="{% url 'astromall:buy_now' product.id %}"
                             class="btn btn-sm btn-danger rounded-pill flex-grow-1">Buy</a>
                         <a href="{% url 'astromall:add_to_cart' product.id %}"

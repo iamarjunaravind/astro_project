@@ -12,7 +12,7 @@ class User(AbstractUser):
 
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
-    phone_number = models.CharField(max_length=15, blank=True, null=True)
+    phone_number = models.CharField(max_length=15, blank=True, null=True, unique=True)
     wallet_balance = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     
     def deduct_wallet(self, amount, description="Wallet Deduction"):
@@ -55,3 +55,13 @@ class Transaction(models.Model):
     
     def __str__(self):
         return f"{self.transaction_type.title()} of {self.amount} for {self.user.username}"
+
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+
+@receiver(post_save, sender=User)
+def create_user_profile(sender, instance, created, **kwargs):
+    if created:
+        # Default 100 credits for new users
+        UserProfile.objects.create(user=instance, wallet_balance=100.00)
+

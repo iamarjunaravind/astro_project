@@ -19,7 +19,7 @@
         border-radius: 12px;
         padding: 2.5rem 2rem;
         width: 100%;
-        max-width: 450px;
+        max-width: 400px;
         box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
         margin-top: 40px;
         margin-bottom: 60px;
@@ -58,10 +58,6 @@
         margin-bottom: 0.5rem;
     }
 
-    .auth-subtitle {
-        color: #666;
-        font-size: 0.95rem;
-    }
 
     .form-group {
         margin-bottom: 1.2rem;
@@ -110,6 +106,13 @@
         background: rgb(140, 10, 10);
     }
 
+    .verify-btn {
+        background: #2b2b2b;
+        margin-top: 0.5rem;
+        font-size: 0.9rem;
+        padding: 8px;
+    }
+
     .auth-footer {
         text-align: center;
         margin-top: 1.5rem;
@@ -126,23 +129,31 @@
     .auth-footer a:hover {
         text-decoration: underline;
     }
+
+    #recaptcha-cont {
+        margin-top: 1rem;
+    }
 </style>
+
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth-compat.js"></script>
 
 <div class="auth-page-wrapper">
     <div class="premium-card">
         <div class="auth-header">
-            <h1 class="auth-title">Signup to continue</h1>
-            <p class="auth-subtitle">Join us to explore the stars</p>
+            <h1 class="auth-title">Create Account</h1>
         </div>
 
-        <form method="post">
+        <form id="register-form" onsubmit="handleRegister(event)">
             {% csrf_token %}
 
             {% for field in form %}
             <div class="form-group">
                 <label for="{{ field.id_for_label }}">{{ field.label }}</label>
                 <input type="{{ field.field.widget.input_type }}" name="{{ field.name }}" id="{{ field.id_for_label }}"
-                    class="custom-input" value="{{ field.value|default:'' }}" {{ field.field.required|yesno:'required,' }}>
+                    class="custom-input" value="{{ field.value|default:'' }}" {{ field.field.required|yesno:'required,'
+                    }}>
                 {% if field.errors %}
                 <div class="text-danger small mt-1">
                     {{ field.errors.0 }}
@@ -151,12 +162,193 @@
             </div>
             {% endfor %}
 
-            <button type="submit" class="submit-btn">Register</button>
+            <!-- Phone Verification Section -->
+            <div class="form-group border-top pt-3 mt-3">
+                <label>Phone Verification (Required)</label>
+
+                <!-- Phone Input Step -->
+                <div id="phone-verification-step">
+                    <input type="text" id="reg-phone" class="custom-input" placeholder="+1234567890">
+                    <div id="recaptcha-cont"></div>
+                    <button type="button" class="submit-btn verify-btn" onclick="sendRegOTP()">Verify Phone</button>
+                </div>
+
+                <!-- OTP Input Step -->
+                <div id="otp-verification-step" style="display: none;">
+                    <input type="text" id="reg-otp" class="custom-input mt-2" placeholder="OTP Code">
+                    <button type="button" class="submit-btn verify-btn" onclick="verifyRegOTP()">Confirm OTP</button>
+
+                    <div class="d-flex justify-content-between align-items-center mt-2">
+                        <span id="resend-timer" class="text-muted small"></span>
+                        <button type="button" id="resend-otp-btn" class="btn btn-link btn-sm p-0"
+                            onclick="resendRegOTP()" disabled style="display: none; color: rgb(171, 13, 13);">
+                            Resend OTP
+                        </button>
+                    </div>
+
+                    <div class="text-success small mt-1" id="otp-status"></div>
+                </div>
+
+                <div id="reg-error" class="text-danger small mt-1"></div>
+            </div>
+
+            <button type="submit" class="submit-btn" id="final-submit-btn" disabled>Register</button>
         </form>
 
         <div class="auth-footer">
-            Already have an account? <a href="{% url 'accounts:login' %}">Login here</a>
+            Already have an account? <a href="{% url 'accounts:login' %}">Login</a>
+            <br><br>
+            <a href="{% url 'accounts:register_astrologer' %}" class="small text-muted">Register as an Astrologer
+                Consultant (Verification Required)</a>
         </div>
     </div>
 </div>
+
+<script>
+    // Firebase Config - TODO: Replace with your config
+    const firebaseConfig = {
+        apiKey: "AIzaSyDIK21gsztqVXyFiLsVPl6mEL88HOE3RZA",
+        authDomain: "otp-login-829df.firebaseapp.com",
+        projectId: "otp-login-829df",
+        storageBucket: "otp-login-829df.firebasestorage.app",
+        messagingSenderId: "1087833694576",
+        appId: "1:1087833694576:web:cd263c632c4c1c7cdb2fb5",
+        measurementId: "G-02T41LGZ8J"
+    };
+
+    if (!firebase.apps.length) {
+        firebase.initializeApp(firebaseConfig);
+    }
+
+    let regConfirmationResult = null;
+    let verifiedIdToken = null;
+    let resendTimerInterval;
+    let resendCooldown = 30; // 30 seconds cooldown
+
+    // Render Recapcha
+    setTimeout(() => {
+        window.recaptchaVerifierReg = new firebase.auth.RecaptchaVerifier('recaptcha-cont', {
+            'size': 'normal',
+            'callback': (response) => {
+                // reCAPTCHA solved
+            }
+        });
+        window.recaptchaVerifierReg.render();
+    }, 1000);
+
+    function sendRegOTP() {
+        const phoneNumber = document.getElementById('reg-phone').value;
+        const appVerifier = window.recaptchaVerifierReg;
+
+        // Reset and hide resend button
+        document.getElementById('resend-otp-btn').style.display = 'none';
+        document.getElementById('reg-error').textContent = "";
+
+        firebase.auth().signInWithPhoneNumber(phoneNumber, appVerifier)
+            .then((result) => {
+                regConfirmationResult = result;
+                document.getElementById('phone-verification-step').style.display = 'none';
+                document.getElementById('otp-verification-step').style.display = 'block';
+
+                // Start Timer
+                startResendTimer();
+
+            }).catch((error) => {
+                document.getElementById('reg-error').textContent = error.message;
+            });
+    }
+
+    function startResendTimer() {
+        resendCooldown = 30;
+        const resendBtn = document.getElementById('resend-otp-btn');
+        const timerDisplay = document.getElementById('resend-timer');
+
+        resendBtn.style.display = 'inline-block';
+        resendBtn.disabled = true;
+        resendBtn.textContent = "Resend OTP";
+
+        clearInterval(resendTimerInterval);
+
+        // Initial call to set text immediately
+        timerDisplay.textContent = `Resend available in ${resendCooldown}s`;
+
+        resendTimerInterval = setInterval(() => {
+            resendCooldown--;
+            timerDisplay.textContent = `Resend available in ${resendCooldown}s`;
+
+            if (resendCooldown <= 0) {
+                clearInterval(resendTimerInterval);
+                timerDisplay.textContent = "";
+                resendBtn.disabled = false;
+            }
+        }, 1000);
+    }
+
+    function resendRegOTP() {
+        // Just call existing sendRegOTP logic logic again
+        // Note: signInWithPhoneNumber handles re-sending. 
+        // It might trigger reCAPTCHA check if invisible one expired or is needed.
+        sendRegOTP();
+    }
+
+    function verifyRegOTP() {
+        const code = document.getElementById('reg-otp').value;
+        regConfirmationResult.confirm(code).then((result) => {
+            const user = result.user;
+            user.getIdToken().then((idToken) => {
+                verifiedIdToken = idToken;
+                document.getElementById('otp-status').textContent = "Phone Verified Successfully!";
+                document.getElementById('final-submit-btn').disabled = false;
+                document.getElementById('final-submit-btn').textContent = "Complete Registration";
+                document.getElementById('otp-verification-step').style.display = 'none'; // hide otp to clean up
+            });
+        }).catch((error) => {
+            document.getElementById('reg-error').textContent = "Invalid OTP";
+        });
+    }
+
+    function handleRegister(e) {
+        e.preventDefault();
+
+        if (!verifiedIdToken) {
+            document.getElementById('reg-error').textContent = "Please verify your phone number first.";
+            return;
+        }
+
+        // Collect Form Data
+        const form = document.getElementById('register-form');
+        const formData = new FormData(form);
+        const username = document.getElementById('id_username') ? document.getElementById('id_username').value : formData.get('username'); // Fallback logic
+        // Django's default UserCreationForm uses 'username' field name if rendered normally.
+        // But since we iterate over form fields, let's try to get input by name ideally.
+        // NOTE: The loop generates names like 'username', 'email'.
+
+        // Let's grab inputs by name attribute for safety
+        const usernameInput = form.querySelector('input[name="username"]');
+        const emailInput = form.querySelector('input[name="email"]'); // If present
+
+        const payload = {
+            idToken: verifiedIdToken,
+            action: 'register',
+            username: usernameInput ? usernameInput.value : 'user_' + Date.now(), // fallback
+            email: emailInput ? emailInput.value : ''
+        };
+
+        fetch("{% url 'accounts:verify_phone_auth' %}", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(payload)
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    window.location.href = data.redirect_url;
+                } else {
+                    document.getElementById('reg-error').textContent = data.message;
+                }
+            });
+    }
+</script>
 {% endblock %}

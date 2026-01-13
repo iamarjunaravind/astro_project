@@ -1,0 +1,105 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container py-3 py-md-5" style="min-height: 80vh;">
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-center mb-4">
+        <div class="mb-3 mb-md-0">
+            <h2 class="fw-bold" style="color: #ab0d0d;">Astrologer Verification</h2>
+            <p class="text-muted mb-0">Review and verify astrologer applications.</p>
+        </div>
+        <a href="{% url 'accounts:admin_dashboard' %}" class="btn btn-outline-secondary rounded-pill px-4 w-100 w-md-auto">
+            <i class="bi bi-arrow-left me-2"></i>Dashboard
+        </a>
+    </div>
+
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body p-4 bg-light rounded">
+            <form method="get" action="{% url 'accounts:admin_astrologer_list' %}" class="row g-3 align-items-end">
+                <div class="col-12 col-md-4">
+                    <label class="form-label text-muted small text-uppercase fw-bold">Filter by Status</label>
+                    <select name="filter" class="form-select border-0 shadow-sm">
+                        <option value="">All Astrologers</option>
+                        <option value="verified" {% if current_filter == "verified" %}selected{% endif %}>Verified</option>
+                        <option value="unverified" {% if current_filter == "unverified" %}selected{% endif %}>Unverified</option>
+                    </select>
+                </div>
+                <div class="col-12 col-md-2">
+                    <button type="submit" class="btn btn-danger w-100 fw-bold shadow-sm"
+                        style="background-color: #ab0d0d; border: none;">Apply Filter</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="card border-0 shadow-sm">
+        <div class="table-responsive">
+            <table class="table align-middle mb-0 table-hover">
+                <thead class="bg-light">
+                    <tr>
+                        <th class="ps-4 py-3 text-uppercase text-muted small">Astrologer</th>
+                        <th class="py-3 text-uppercase text-muted small">Experience</th>
+                        <th class="py-3 text-uppercase text-muted small">Skills</th>
+                        <th class="py-3 text-uppercase text-muted small">Status</th>
+                        <th class="py-3 text-uppercase text-muted small text-end pe-4">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for astrologer in astrologers %}
+                    <tr>
+                        <td class="ps-4">
+                            <div class="d-flex align-items-center">
+                                <div class="bg-light rounded-circle d-flex align-items-center justify-content-center text-primary fw-bold me-3 text-uppercase"
+                                    style="width: 40px; height: 40px; font-size: 1.2rem; color: #6610f2 !important;">
+                                    {{ astrologer.user.username|first }}
+                                </div>
+                                <div class="fw-bold text-dark">{{ astrologer.user.username }}</div>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="badge bg-light text-dark border">{{ astrologer.experience_years }} Years</span>
+                        </td>
+                        <td>
+                            {% if astrologer.skills.all %}
+                            {% for skill in astrologer.skills.all %}
+                            <span class="badge bg-secondary mb-1">{{ skill.name }}</span>
+                            {% endfor %}
+                            {% else %}
+                            <span class="text-muted small">No skills listed</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if astrologer.is_verified %}
+                            <span class="badge bg-success rounded-pill px-3">Verified</span>
+                            {% else %}
+                            <span class="badge bg-warning text-dark rounded-pill px-3">Unverified</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-end pe-4">
+                            {% if not astrologer.is_verified %}
+                            <form method="post" action="{% url 'accounts:admin_verify_astrologer' astrologer.pk %}"
+                                style="display:inline;">
+                                {% csrf_token %}
+                                <button type="submit" name="action" value="approve"
+                                    class="btn btn-sm btn-success rounded-pill px-3 me-1">Verify</button>
+                            </form>
+                            {% endif %}
+                            <form method="post" action="{% url 'accounts:admin_verify_astrologer' astrologer.pk %}"
+                                style="display:inline;">
+                                {% csrf_token %}
+                                <button type="submit" name="action" value="reject"
+                                    class="btn btn-sm btn-outline-danger rounded-pill px-3"
+                                    onclick="return confirm('Are you sure you want to reject/remove verification?');">Reject</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" class="text-center py-5 text-muted">No astrologers found.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

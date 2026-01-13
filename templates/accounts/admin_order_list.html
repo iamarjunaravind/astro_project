@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container py-5" style="min-height: 80vh;">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold" style="color: #ab0d0d;">Order Management</h2>
+            <p class="text-muted">Track and update customer orders.</p>
+        </div>
+        <a href="{% url 'accounts:admin_dashboard' %}" class="btn btn-outline-secondary rounded-pill px-4">
+            <i class="bi bi-arrow-left me-2"></i>Dashboard
+        </a>
+    </div>
+
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body p-4 bg-light rounded">
+            <form method="get" action="{% url 'accounts:admin_order_list' %}" class="row g-3 align-items-end">
+                <div class="col-md-4">
+                    <label class="form-label text-muted small text-uppercase fw-bold">Filter by Status</label>
+                    <select name="status" class="form-select border-0 shadow-sm">
+                        <option value="">All Orders</option>
+                        {% for status_choice in status_choices %}
+                        <option value="{{ status_choice }}" {% if current_status == status_choice %}selected{% endif %}>{{ status_choice }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-danger w-100 fw-bold shadow-sm"
+                        style="background-color: #ab0d0d; border: none;">Apply Filter</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="card border-0 shadow-sm">
+        <div class="table-responsive">
+            <table class="table align-middle mb-0 table-hover">
+                <thead class="bg-light">
+                    <tr>
+                        <th class="ps-4 py-3 text-uppercase text-muted small">Order ID</th>
+                        <th class="py-3 text-uppercase text-muted small">Date</th>
+                        <th class="py-3 text-uppercase text-muted small">Customer</th>
+                        <th class="py-3 text-uppercase text-muted small">Total</th>
+                        <th class="py-3 text-uppercase text-muted small">Current Status</th>
+                        <th class="py-3 text-uppercase text-muted small">Update Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for order in orders %}
+                    <tr>
+                        <td class="ps-4 fw-bold">#{{ order.id }}</td>
+                        <td class="text-muted">{{ order.created_at|date:"M d, Y H:i" }}</td>
+                        <td>
+                            <div class="fw-bold text-dark">{{ order.customer.username }}</div>
+                        </td>
+                        <td class="fw-bold text-danger">₹{{ order.total_amount }}</td>
+                        <td>
+                            {% if order.status == 'Pending' %}
+                            <span class="badge bg-warning text-dark rounded-pill px-3">Pending</span>
+                            {% elif order.status == 'Processing' %}
+                            <span class="badge bg-info text-dark rounded-pill px-3">Processing</span>
+                            {% elif order.status == 'Shipped' %}
+                            <span class="badge bg-primary rounded-pill px-3">Shipped</span>
+                            {% elif order.status == 'Delivered' %}
+                            <span class="badge bg-success rounded-pill px-3">Delivered</span>
+                            {% elif order.status == 'Cancelled' %}
+                            <span class="badge bg-secondary rounded-pill px-3">Cancelled</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <form method="post" action="{% url 'accounts:admin_update_order_status' order.pk %}"
+                                class="d-flex">
+                                {% csrf_token %}
+                                <select name="status" class="form-select form-select-sm me-2 border-secondary"
+                                    style="width: 130px;">
+                                    {% for status_choice in status_choices %}
+                                    <option value="{{ status_choice }}" {% if order.status == status_choice %}selected{% endif %}>{{ status_choice }}</option>
+                                    {% endfor %}
+                                </select>
+                                <button type="submit" class="btn btn-sm btn-outline-dark">Update</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="text-center py-5 text-muted">No orders found matching your criteria.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

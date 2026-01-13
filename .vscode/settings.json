@@ -1,0 +1,21 @@
+{
+    "files.associations": {
+        "**/*.html": "django-html",
+        "**/templates/**/*.html": "django-html"
+    },
+    "emmet.includeLanguages": {
+        "django-html": "html"
+    },
+    "editor.formatOnSave": false,
+    "editor.formatOnPaste": false,
+    "[django-html]": {
+        "editor.defaultFormatter": null,
+        "editor.formatOnSave": false,
+        "editor.formatOnPaste": false
+    },
+    "[html]": {
+        "editor.defaultFormatter": null,
+        "editor.formatOnSave": false,
+        "editor.formatOnPaste": false
+    }
+}

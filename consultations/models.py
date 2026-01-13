@@ -5,6 +5,7 @@ class ChatSession(models.Model):
     customer = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='consultations_as_customer')
     astrologer = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='consultations_as_astrologer')
     start_time = models.DateTimeField(auto_now_add=True)
+    actual_start_time = models.DateTimeField(null=True, blank=True, help_text="Time when astrologer sends first message")
     end_time = models.DateTimeField(null=True, blank=True)
     is_active = models.BooleanField(default=True)
     
