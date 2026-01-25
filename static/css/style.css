@@ -10,6 +10,12 @@
     --gold-glow: rgba(251, 191, 36, 0.4); /* Halo Effect */
 }
 
+html {
+    scroll-behavior: smooth;
+}
+
+/* RESET & CORE */
+
 /* RESET & CORE */
 * {
     margin: 0;
@@ -237,6 +243,12 @@ main {
     color: var(--wood-brown);
 }
 
+.service img {
+    width: 50px;
+    height: 50px;
+    object-fit: contain;
+}
+
 /* ================= STATS ================= */
 /* ================= STATS ================= */
 .stats {
@@ -263,7 +275,7 @@ h2 {
     color: var(--kumkum-red);
     background: none;
     -webkit-text-fill-color: initial;
-    margin-bottom: 2.5rem;
+    margin-bottom: 1rem;
     font-weight: 800;
     position: relative;
     display: inline-block;
@@ -383,6 +395,19 @@ h2 {
     .card-scroll-item {
         width: 180px; /* Reduced width for desktop */
     }
+    .hero {
+        margin: 10px 170px !important;
+        padding: 20px 30px !important;
+    }
+    .sacred-nav{
+        height: 120px !important;
+    }
+    .mainContainer {
+        padding-top: 80px !important;
+    }
+    .hero img.mainImage {
+        margin-right: 120px !important;
+    }
 }
 
 /* ================= FOOTER ================= */
@@ -442,6 +467,7 @@ footer a:hover {
     cursor: pointer;
     z-index: 100;
 }
+    
 
 /* ================= RESPONSIVE ================= */
 @media (max-width: 991.98px) {
@@ -523,6 +549,15 @@ footer a:hover {
 }
 
 @media (max-width:768px) {
+    .hero{
+        margin: 5px 14px !important;
+        padding: 10px 15px !important;
+        border-radius: 14px;
+        flex-direction: row;
+        align-items: center;
+        gap: 10px;
+        min-height: 180px; /* Ensure height for image */
+    }
     .translate-middle {
         transform: translate(-71%, 11%) !important;
         font-size: 0.5rem !important;
@@ -542,16 +577,6 @@ footer a:hover {
     }
 
     /* header rule removed */
-
-    .hero {
-        margin: 12px;
-        padding: 20px 15px;
-        border-radius: 14px;
-        flex-direction: row;
-        align-items: center;
-        gap: 10px;
-        min-height: 180px; /* Ensure height for image */
-    }
 
     .hero h1 {
         font-size: 22px;
@@ -642,6 +667,8 @@ footer a:hover {
         font-size: 12px;
         padding: 16px 0;
     }
+
+
 
     .section {
         padding: 16px;
@@ -818,6 +845,125 @@ footer a:hover {
 .simple-fade {
     animation: simpleFade 1s ease-in-out forwards;
     opacity: 0;
+}
+
+/* ================= PRODUCT GRID ================= */
+.category-wrapper {
+    width: 80%;
+    margin: 0 auto;
+}
+
+.product-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 15px;
+    width: 100%;
+}
+
+.product-grid .card {
+    width: 100%; /* Ensure card takes full width of grid cell */
+    height: 100%;
+}
+
+@media (max-width: 1200px) {
+    .product-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+@media (max-width: 992px) {
+    .product-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .category-wrapper {
+        width: 100%;
+        padding: 0 16px;
+    }
+
+    .product-grid {
+        display: flex;
+        overflow-x: auto;
+        gap: 10px;
+        padding-bottom: 10px;
+        width: 100%;
+    }
+    
+
+    .product-grid .card {
+        min-width: 150px;
+        flex: 0 0 auto;
+    }
+}
+
+/* ================= MOBILE ASTROLOGER LIST VIEW ================= */
+@media (max-width: 576px) {
+    .service-card {
+        display: flex !important;
+        flex-direction: row !important;
+        align-items: center !important;
+        text-align: left !important;
+        padding: 12px !important;
+        gap: 15px;
+    }
+
+    .service-card .avatar-container {
+        margin: 0 !important;
+        width: 70px !important;
+        height: 70px !important;
+        flex-shrink: 0;
+    }
+
+    .astrologer-info {
+        text-align: left !important;
+        width: 100%;
+    }
+
+    .astrologer-info h5 {
+        text-align: left !important;
+        font-size: 16px;
+        margin-bottom: 2px !important;
+    }
+    
+    .astrologer-info .text-warning {
+        text-align: left !important;
+        margin-bottom: 4px !important;
+    }
+
+    .price-container {
+        justify-content: flex-start !important;
+        margin-bottom: 4px !important;
+        gap: 8px !important;
+    }
+
+    .skill-container {
+        text-align: left !important;
+        margin-bottom: 8px !important;
+    }
+
+    .service-card .d-grid {
+        display: flex !important;
+        gap: 8px;
+        align-items: center;
+    }
+
+    .service-card .d-grid .row {
+       flex-grow: 1;
+       display: flex; /* Ensure buttons are side by side */
+       margin: 0;
+       width: auto;
+    }
+    
+    .service-card .d-grid .row .col-6 {
+        flex: 1;
+        padding: 0 2px;
+    }
+
+    .service-card .btn-link {
+        display: none; /* Hide 'View' link on mobile if buttons are efficient */
+    }
 }
 
 
