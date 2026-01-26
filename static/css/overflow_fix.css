@@ -1,0 +1,7 @@
+
+/* ================= OVERFLOW FIX (ADDED) ================= */
+html, body {
+    overflow-x: hidden !important;
+    width: 100%;
+    position: relative;
+}

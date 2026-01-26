@@ -1,2 +1,3 @@
 // Main JavaScript
-console.log("Astrotalk Clone Loaded");
+console.log("SreeManthra Loaded");
+

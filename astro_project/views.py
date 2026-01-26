@@ -3,9 +3,9 @@ from astrologers.models import AstrologerProfile
 from astromall.models import Product, Category
 
 def home_view(request):
-    astrologers = AstrologerProfile.objects.all()[:4]
-    # Fetch categories that have products, and prefetch products for them
-    categories = Category.objects.filter(products__isnull=False).distinct().prefetch_related('products')
+    astrologers = AstrologerProfile.objects.all()[:14]
+    # Fetch categories and prefetch products for each to avoid N+1 queries
+    categories = Category.objects.all().prefetch_related('products')
     
     context = {
         'astrologers': astrologers,

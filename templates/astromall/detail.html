@@ -6,11 +6,51 @@
     <div class="card p-4 mx-auto border-0 shadow-sm" style="max-width: 1000px;">
         <div class="row g-5 align-items-center">
             <div class="col-md-6">
-                {% if product.image %}
-                <img src="{{ product.image.url }}" alt="{{ product.name }}" class="img-fluid rounded shadow">
-                {% else %}
-                <img src="{% static 'img/default_product.png' %}" alt="{{ product.name }}"
-                    class="img-fluid rounded shadow" style="width: 100%; max-height: 400px; object-fit: cover;">
+                <!-- Main Image -->
+                <div class="mb-3 text-center">
+                    {% if product.image %}
+                    <img id="mainImage" src="{{ product.image.url }}" alt="{{ product.name }}" 
+                         class="img-fluid rounded shadow" 
+                         style="width: 100%; max-height: 400px; object-fit: contain; background: #fff;">
+                    {% else %}
+                    <img id="mainImage" src="{% static 'img/default_product.png' %}" alt="{{ product.name }}"
+                        class="img-fluid rounded shadow" 
+                        style="width: 100%; max-height: 400px; object-fit: cover;">
+                    {% endif %}
+                </div>
+
+                <!-- Thumbnails -->
+                {% if product.images.exists %}
+                <div class="d-flex gap-2 justify-content-center overflow-auto pb-2">
+                    <!-- Main Image Thumbnail -->
+                    {% if product.image %}
+                    <img src="{{ product.image.url }}" 
+                         class="rounded border border-2 border-danger shadow-sm cursor-pointer gallery-thumbnail" 
+                         style="width: 60px; height: 60px; object-fit: cover; cursor: pointer;"
+                         onclick="changeMainImage(this)">
+                    {% endif %}
+                    
+                    <!-- Gallery Images -->
+                    {% for img in product.images.all %}
+                    <img src="{{ img.image.url }}" 
+                         class="rounded border shadow-sm cursor-pointer gallery-thumbnail" 
+                         style="width: 60px; height: 60px; object-fit: cover; cursor: pointer;"
+                         onclick="changeMainImage(this)">
+                    {% endfor %}
+                </div>
+                
+                <script>
+                    function changeMainImage(thumbnail) {
+                        // Update main image source
+                        document.getElementById('mainImage').src = thumbnail.src;
+                        
+                        // Update active border styles
+                        document.querySelectorAll('.gallery-thumbnail').forEach(el => {
+                            el.classList.remove('border-danger', 'border-2');
+                        });
+                        thumbnail.classList.add('border-danger', 'border-2');
+                    }
+                </script>
                 {% endif %}
             </div>
             <div class="col-md-6">

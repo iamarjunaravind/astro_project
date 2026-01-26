@@ -3,138 +3,253 @@
 {% load i18n %}
 
 {% block content %}
-<div class="mainContainer">
-    <section class="hero" data-aos="fade-up">
-        <div>
-            <p>{% trans "200+ Celebs recommend" %}</p>
-            <h1>{% trans "Talk with Astrologer" %}</h1>
-            <a href="{% url 'astrologers:astrologer_list' %}" class="hero-btn">{% trans "Talk Now" %}</a>
+<div class="mainContainer" style="background: #FFF;">
+    <!-- Hero Section -->
+    <section class="hero-sm bg-spiritual-pattern pb-3" style="background-color: var(--sm-light-orange); min-height: 420px;">
+        <div class="container d-flex flex-column flex-lg-row align-items-center justify-content-between gap-lg-5">
+            <div class="hero-banner-left text-lg-start text-center">
+                <h1 class="hero-main-title">Direct Your Life To The Right Path</h1>
+                <div class="hero-sub-title mb-4">Get Personalised Handwritten Enhanced Janampatri</div>
+                <div class="hero-promotion-badge mb-4">31% OFF!!!</div>
+                <a href="#" class="btn-sm-primary shadow-sm">Buy Now</a>
+            </div>
+
+            <div class="hero-expert-right">
+                <div class="ask-an-expert-card-v2">
+                    <div class="card-ornament ornament-tl">
+                        <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><path d="M0 0h100v20H20v80H0V0z" fill="#DE1F26"/></svg>
+                    </div>
+                    <div class="card-ornament ornament-br">
+                        <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><path d="M0 0h100v20H20v80H0V0z" fill="#DE1F26"/></svg>
+                    </div>
+
+                    <h3 class="expert-title">ASK AN EXPERT</h3>
+                    <p class="expert-desc">Get Accurate Answers to any problems From Experienced & Expert Astrologers Within 48 Hours.</p>
+                    <form>
+                        <div class="mb-2">
+                            <label class="small fw-bold mb-1">Post Your Question</label>
+                            <textarea class="form-control-sm-v2" rows="4" placeholder="I am facing continuous struggles in my career. When will I get lasting relief?"></textarea>
+                            <p class="text-start mb-3" style="font-size: 10px; color: #999;">Min 50 Characters</p>
+                        </div>
+                        <button type="button" class="btn-sm-experts-submit w-100">ASK NOW</button>
+                    </form>
+                </div>
+            </div>
         </div>
-        <!-- Hero Image -->
-        <img class="mainImage" src="{% static 'img/hero.png' %}" alt="{% trans 'Astrologer' %}">
     </section>
 
-    <section class="services row text-center" data-aos="fade-up" data-aos-delay="100">
-        <div class="service col">
-            <a href="{% url 'astrologers:astrologer_list' %}">
-                <img src="{% static 'img/icon_talk.png' %}" alt="{% trans 'Talk' %}" style="width: 50px; height: 50px;">
-                <p>{% trans "Talk to Astrologer" %}</p>
-            </a>
+    <!-- Featured Astrologers Section -->
+    <section class="section container py-5">
+        <div class="d-flex justify-content-between align-items-center mb-4 section-header">
+    <h2 class="mobile-sec-title" style="color: #800000; font-weight: 900; font-size: 24px;">Get Your First Call or Chat FREE with Our Expert Astrologers</h2>
+    <a href="{% url 'astrologers:astrologer_list' %}" class="text-danger fw-bold small text-decoration-none mobile-view-all">View All</a>
+</div>
+            
+        <div class="astro-grid-7" id="astro-grid-mobile">
+        {% for profile in astrologers|slice:":14" %}
+        <div class="astrologer-card-sm">
+            <div class="astro-photo-wrapper">
+                {% if profile.profile_picture %}
+                <img src="{{ profile.profile_picture.url }}" alt="{{ profile.user.username }}" class="astro-photo-sm">
+                {% else %}
+                <img src="{% static 'img/default_avatar.png' %}" alt="{{ profile.user.username }}" class="astro-photo-sm">
+                {% endif %}
+                <span class="online-indicator-sm"></span>
+            </div>
+            <h5 class="astro-name-sm px-1">{{ profile.user.get_full_name|default:profile.user.username|title }}</h5>
+            <p class="astro-skills-sm px-1">{{ profile.specializations.all|join:", " }}</p>
+            <div class="astro-meta-sm">
+                <span class="astro-rating-sm"><i class="bi bi-star-fill"></i> 4.9</span>
+                <span class="astro-exp-sm">{{ profile.experience_years }} Years</span>
+            </div>
+            <p class="astro-lansm-sm text-truncate px-1"><i class="bi bi-translate"></i> {% for lang in profile.languages.all %}{{ lang.name }}{% if not forloop.last %}, {% endif %}{% endfor %}</p>
+            
+            <div class="astro-actions-sm d-flex gap-1">
+                <a href="{% url 'astrologers:astrologer_detail' profile.pk %}" class="btn btn-sm-green w-100">Free call</a>
+                <a href="{% url 'astrologers:astrologer_detail' profile.pk %}" class="btn btn-sm-green w-100">Free chat</a>
+            </div>
         </div>
-        <div class="service col">
-            <a href="{% url 'astrologers:astrologer_list' %}">
-                <img src="{% static 'img/icon_chat.png' %}" alt="{% trans 'Chat' %}" style="width: 50px; height: 50px;">
-                <p>{% trans "Chat with Astrologer" %}</p>
-            </a>
+        {% empty %}
+        <div class="col-12 text-center py-5">
+            <p class="text-muted">{% trans "No astrologers found." %}</p>
         </div>
-        <div class="service col">
-            <a href="{% url 'astromall:product_list' %}">
-                <img src="{% static 'img/icon_store.png' %}" alt="{% trans 'Store' %}" style="width: 50px; height: 50px;">
-                <p>{% trans "Pujya Store" %}</p>
-            </a>
+        {% endfor %}
+    </div>
+
+    </section>
+
+    <!-- Dynamic Product Categories Section -->
+    <section class="section py-5">
+        <div class="container">
+            <div class="row">
+                <!-- Deal of the Day Sidebar -->
+                <div class="col-lg-3 d-none d-lg-block">
+                    <div class="deal-of-the-day-sm">
+                        <div class="deal-badge">DEAL OF THE DAY</div>
+                        <div class="deal-content p-3 text-center">
+                            <img src="{% static 'img/report_sample.png' %}" alt="Deal" class="img-fluid mb-3">
+                            <h5 class="fw-bold h6">Detailed Life Report</h5>
+                            <p class="small text-muted">Deep Life Analysis, Life Long Predictions</p>
+                            <div class="deal-price-sm mb-3">
+                                <span class="old-price">₹ 9,999</span>
+                                <span class="new-price">₹ 4,999.00</span>
+                                <span class="discount-label">50% OFF</span>
+                            </div>
+                            <a href="{% url 'astromall:product_list' %}" class="btn btn-sm-orange w-100 fw-bold">Buy Now</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Products by Category -->
+                <div class="col-lg-9">
+                    {% for category in categories %}
+                    {% if category.products.exists %}
+                    <div class="category-section mb-5">
+                        <div class="d-flex justify-content-between align-items-center mb-3 section-header">
+    <h3 class="mobile-sec-title" style="color: #800000; font-weight: 800; font-size: 22px;">{{ category.name }}</h3>
+    <a href="{% url 'astromall:product_list' %}?category={{ category.id }}" class="text-danger fw-bold small text-decoration-none mobile-view-all">View All</a>
+</div>
+                        <div class="product-grid" id="product-grid-{{ forloop.counter }}">
+                                {% for product in category.products.all %}
+                                    <div class="product-card-sm">
+                                        {% if product.image %}
+                                        <img src="{{ product.image.url }}" alt="{{ product.name }}" class="product-img-sm">
+                                        {% else %}
+                                        <img src="{% static 'img/report_sample.png' %}" alt="{{ product.name }}" class="product-img-sm">
+                                        {% endif %}
+                                        <div class="product-info-sm">
+                                            <h6 class="fw-bold mb-1 text-truncate">{{ product.name }}</h6>
+                                            <div class="product-price-small">₹ {{ product.price }}</div>
+                                        </div>
+                                        <a href="{% url 'astromall:product_detail' product.pk %}" class="product-arrow-sm"><i class="bi bi-arrow-right"></i></a>
+                                    </div>
+                                {% endfor %}
+                        </div>
+
+                    </div>
+                    {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
         </div>
-        <div class="service col">
-            <a href="{% url 'astromall:pooja_list' %}">
-                <img src="{% static 'img/icon_pooja.png' %}" alt="{% trans 'Puja' %}" style="width: 50px; height: 50px;">
-                <p>{% trans "Book a Pooja" %}</p>
-            </a>
+    </section>
+
+    <!-- Horoscope Section 1:1 -->
+    <section class="horoscope-sm-section pb-4">
+        <div class="container">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div class="horoscope-main-badge">Your Personalised Horoscope</div>
+                <div class="d-flex align-items-center gap-2">
+                    <span class="small fw-bold text-muted">Select your Sun sign</span>
+                    <select class="form-select form-select-sm" style="width: 150px;">
+                        <option>Aries</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="row g-4">
+                <div class="col-lg-3 col-md-6 border-end-sm">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h4 class="h6 fw-bold mb-0">Daily</h4>
+                        <select class="form-select form-select-sm border-0 bg-light-sm" style="width: auto;"><option>Select option</option></select>
+                    </div>
+                    <p class="horo-desc">Perhaps you woke up today morning with a great sense of self-importance. However, it is unlikely that others will feel the same way about you.</p>
+                    <a href="#" class="horo-link">Read More</a>
+                </div>
+                <div class="col-lg-3 col-md-6 border-end-sm">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h4 class="h6 fw-bold mb-0">Weekly</h4>
+                        <select class="form-select form-select-sm border-0 bg-light-sm" style="width: auto;"><option>Select option</option></select>
+                    </div>
+                    <p class="horo-desc">This week blends fiery passion with quiet reflection in your love life. With Mars pushing for intensity and the Venus highlighting your emotional needs.</p>
+                    <a href="#" class="horo-link">Read More</a>
+                </div>
+                <div class="col-lg-3 col-md-6 border-end-sm">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h4 class="h6 fw-bold mb-0">Monthly</h4>
+                        <select class="form-select form-select-sm border-0 bg-light-sm" style="width: auto;"><option>Select option</option></select>
+                    </div>
+                    <p class="horo-desc">This month brings a powerful blend of passion, clarity, and emotional growth for you. As the month kicks off, Venus and Mars align to spark romance.</p>
+                    <a href="#" class="horo-link">Read More</a>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h4 class="h6 fw-bold mb-0">Yearly</h4>
+                        <select class="form-select form-select-sm border-0 bg-light-sm" style="width: auto;"><option>Select option</option></select>
+                    </div>
+                    <p class="horo-desc">The year 2026 will be marked by a blend of ambition, reflection, and deep emotional insight. The steady influences of Saturn, Mars, Mercury.</p>
+                    <a href="#" class="horo-link">Read More</a>
+                </div>
+            </div>
+
+            <div class="horoscope-cta-bar mt-5">
+                <div class="d-flex justify-content-between align-items-center w-100 px-4 py-3">
+                    <div class="d-flex align-items-center gap-3">
+                        <i class="bi bi-bell-fill text-danger fs-4"></i>
+                        <span class="fw-bold">Detailed Personalized 2026 – Predictions Inside!</span>
+                    </div>
+                    <a href="#" class="btn btn-sm-cta-dark">Buy Now</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials Section -->
+    <section class="testimonials-sm-section">
+        <div class="container">
+            <div class="text-center mb-5">
+                <h2 style="color: #800000; font-weight: 900; font-size: 32px;">What Our Customers Say</h2>
+                <div style="width: 60px; height: 4px; background: #F7941D; margin: 15px auto;"></div>
+            </div>
+            
+            <div class="row g-4">
+                <div class="col-lg-4">
+                    <div class="testimonial-card">
+                        <div class="testimonial-rating">
+                            <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
+                        </div>
+                        <p class="testimonial-quote">"The guidance I received here was truly transformative. The depth of the personal chart analysis helped me make a confident career shift. SreeManthra is now my go-to for clarity."</p>
+                        <div class="testimonial-user">
+                            <img src="{% static 'img/default_avatar.png' %}" alt="User" class="testimonial-avatar">
+                            <div class="testimonial-info">
+                                <h5>Aditya Varma</h5>
+                                <p>Hyderabad, India</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="testimonial-card">
+                        <div class="testimonial-rating">
+                            <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
+                        </div>
+                        <p class="testimonial-quote">"Finally found an astrology platform that values accuracy over generalities. The consultation was insightful, and the practical remedies have brought much peace to my home life."</p>
+                        <div class="testimonial-user">
+                            <img src="{% static 'img/default_avatar.png' %}" alt="User" class="testimonial-avatar">
+                            <div class="testimonial-info">
+                                <h5>Ananya G.</h5>
+                                <p>Chennai, India</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="testimonial-card">
+                        <div class="testimonial-rating">
+                            <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
+                        </div>
+                        <p class="testimonial-quote">"The level of professionalism and the clarity of the reports are unmatched. I've recommended SreeManthra to all my friends seeking authentic Vedic guidance."</p>
+                        <div class="testimonial-user">
+                            <img src="{% static 'img/default_avatar.png' %}" alt="User" class="testimonial-avatar">
+                            <div class="testimonial-info">
+                                <h5>Sandeep K.</h5>
+                                <p>Delhi, India</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </section>
 </div>
-
-<section class="stats" data-aos="fade-up">
-    <div>{% trans "46,702+" %}<br>{% trans "Total Astrologers" %}</div>
-    <div>{% trans "1326M" %}<br>{% trans "Minutes" %}</div>
-    <div>{% trans "109.4M" %}<br>{% trans "Customers" %}</div>
-</section>
-
-<!-- Featured Astrologers Section -->
-<section class="KKOMER section container" data-aos="fade-up">
-    <h2>{% trans "OUR ASTROLOGERS" %}</h2>
-
-    <div class="row g-4">
-        {% for profile in astrologers %}
-        <div class="col-lg-3 col-md-4 col-sm-6 col-6">
-            <div class="service-card">
-                <!-- Avatar Placeholder -->
-                <div style="margin: 10px auto;">
-                    <img src="{% static 'img/default_avatar.png' %}" alt="Avatar"
-                        style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover;">
-                </div>
-                <h5 style="font-size: 16px; margin-bottom: 5px;">{{ profile.user.username }}</h5>
-                <p style="font-size: 13px; color: #777;">Starts at ₹{{ profile.chat_price_per_minute }}/{% trans "min"%}</p>
-                <div style="margin-top: 10px;">
-                    <a href="{% url 'astrologers:astrologer_detail' profile.pk %}" class="btn btn-outline-danger btn-sm"
-                        style="border-radius: 20px;">{% trans "Consult" %}</a>
-                </div>
-            </div>
-        </div>
-        {% empty %}
-        <p class="text-center">{% trans "No astrologers found." %}</p>
-        {% endfor %}
-    </div>
-</section>
-
-<!-- Astromall Section -->
-<section class="section" data-aos="fade-up">
-    <h1>{% trans "Pujya Store" %}</h1>
-    <h2>{% trans "TOP SELLING PRODUCTS" %}</h2>
-    <div class="container pb-2">
-        {% for category in categories %}
-        {% if category.products.exists %}
-        <div class="mb-3 category-wrapper">
-            <h3 class="fw-bold mb-3" style="color: #9F1239;">{{ category.name }}</h3>
-            <div class="product-grid">
-                {% for product in category.products.all %}
-                <div class="card h-100 border-0 shadow-sm" style="border: 1px solid #eaeaea;">
-                    <a href="{% url 'astromall:product_detail' product.pk %}" class="text-decoration-none text-dark">
-                        <div style="position: relative; border-radius: 0; overflow: hidden; background: #f8f9fa;">
-                             <!-- Image Aspect Ratio 1:1 -->
-                            <div style="padding-top: 100%;"></div>
-                            {% if product.image %}
-                            <img src="{{ product.image.url }}" alt="{{ product.name }}" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover;">
-                            {% else %}
-                            <img src="{% static 'img/default_product.png' %}" alt="{{ product.name }}" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover;">
-                            {% endif %}
-                            <!-- Badge -->
-                             <span class="position-absolute top-0 end-0 badge bg-danger m-2 rounded-undefined" style="font-size: 0.7rem;">-10%</span>
-                        </div>
-                        
-                        <div class="card-body p-2 d-flex flex-column">
-                            <h6 class="card-title fw-bold text-truncate mb-1" style="font-size: 0.95rem; color: var(--kumkum-red);">{{ product.name }}</h6>
-                            
-                            <!-- Mock Rating -->
-                            <div class="mb-2 text-warning small">
-                                <i class="bi bi-star-fill"></i>
-                                <i class="bi bi-star-fill"></i>
-                                <i class="bi bi-star-fill"></i>
-                                <i class="bi bi-star-fill"></i>
-                                <i class="bi bi-star-half"></i>
-                                <span class="text-muted ms-1" style="font-size: 0.75rem;">(4.5)</span>
-                            </div>
-
-                            <div class="mt-auto">
-                                <p class="card-text m-0 text-nowrap">
-                                    <span class="text-muted text-decoration-line-through small me-2" style="font-size: 0.8rem;">₹{{ product.price|add:"100" }}</span>
-                                    <span class="text-danger fw-bold">₹{{ product.price }}</span>
-                                </p>
-                            </div>
-                        </div>
-                    </a>
-                </div>
-                {% endfor %}
-            </div>
-        </div>
-        {% endif %}
-        {% empty %}
-        <p class="text-center">{% trans "No products found." %}</p>
-        {% endfor %}
-    </div>
-
-    <div class="text-center mt-3">
-        <a href="{% url 'astromall:product_list' %}" class="btn btn-outline-dark"
-            style="border-radius: 20px; padding: 10px 30px;">{% trans "View All Products" %}</a>
-    </div>
-</section>
-
 {% endblock %}

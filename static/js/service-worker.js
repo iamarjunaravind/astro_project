@@ -1,4 +1,4 @@
-const CACHE_NAME = 'pujya-astro-v1';
+const CACHE_NAME = 'SreeManthra-astro-v3';
 const URLS_TO_CACHE = [
   '/',
   '/static/css/style.css',
